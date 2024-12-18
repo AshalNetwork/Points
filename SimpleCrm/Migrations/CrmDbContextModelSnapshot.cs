@@ -10,7 +10,7 @@ using SimpleCrm.Contexts;
 
 namespace SimpleCrm.Migrations
 {
-    [DbContext(typeof(CrmDbContext))]
+    [DbContext(typeof(PointsDbContext))]
     partial class CrmDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

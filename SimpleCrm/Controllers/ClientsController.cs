@@ -14,10 +14,10 @@ using System.Security.Claims;
 namespace SimpleCrm.Controllers
 {
     [Authorize]
-    public class ClientsController(IUnitOfWork unitOfWork, CrmDbContext context, ILogger<HomeController> logger, UserManager<ApplicationUser> userManager) : Controller
+    public class ClientsController(IUnitOfWork unitOfWork, PointsDbContext context, ILogger<HomeController> logger, UserManager<ApplicationUser> userManager) : Controller
     {
         private readonly ILogger<HomeController> _logger = logger;
-        private readonly CrmDbContext _context = context;
+        private readonly PointsDbContext _context = context;
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
 

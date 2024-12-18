@@ -11,7 +11,7 @@ using SimpleCrm.Contexts;
 
 namespace SimpleCrm.Migrations
 {
-    [DbContext(typeof(CrmDbContext))]
+    [DbContext(typeof(PointsDbContext))]
     [Migration("20240813122546_firstMigration")]
     partial class firstMigration
     {

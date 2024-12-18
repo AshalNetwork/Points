@@ -9,10 +9,10 @@ using SimpleCrm.VM;
 namespace SimpleCrm.Controllers
 {
     [Authorize]
-    public class UsersController(SignInManager<ApplicationUser> signInManager,UserManager<ApplicationUser> userManager,IUnitOfWork unitOfWork, CrmDbContext context, ILogger<UsersController> logger) : Controller
+    public class UsersController(SignInManager<ApplicationUser> signInManager,UserManager<ApplicationUser> userManager,IUnitOfWork unitOfWork, PointsDbContext context, ILogger<UsersController> logger) : Controller
     {
         private readonly ILogger<UsersController> _logger = logger;
-        private readonly CrmDbContext _context = context;
+        private readonly PointsDbContext _context = context;
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly UserManager<ApplicationUser> _userManager=userManager;
         private readonly SignInManager<ApplicationUser> _signInManager=signInManager;

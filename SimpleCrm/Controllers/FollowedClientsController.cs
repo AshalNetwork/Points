@@ -9,7 +9,7 @@ using System.Security.Claims;
 
 namespace SimpleCrm.Controllers
 {
-    public class FollowedClientsController(IUnitOfWork unitOfWork, CrmDbContext context, UserManager<ApplicationUser> userManager) : Controller
+    public class FollowedClientsController(IUnitOfWork unitOfWork, PointsDbContext context, UserManager<ApplicationUser> userManager) : Controller
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly UserManager<ApplicationUser> _userManager = userManager;

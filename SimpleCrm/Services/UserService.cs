@@ -9,9 +9,9 @@ using System.Data;
 
 namespace ashal.Services
 {
-    public class UserService(CrmDbContext context, IEmailService emailService) : IUserService
+    public class UserService(PointsDbContext context, IEmailService emailService) : IUserService
     {
-        private readonly CrmDbContext _context = context;
+        private readonly PointsDbContext _context = context;
         private readonly IEmailService _emailService = emailService;
 
         public async Task SendVerificationnCode(string userId, string userEmail,string body)

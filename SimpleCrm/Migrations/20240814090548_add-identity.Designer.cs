@@ -11,7 +11,7 @@ using SimpleCrm.Contexts;
 
 namespace SimpleCrm.Migrations
 {
-    [DbContext(typeof(CrmDbContext))]
+    [DbContext(typeof(PointsDbContext))]
     [Migration("20240814090548_add-identity")]
     partial class addidentity
     {

@@ -16,14 +16,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddDbContext<CrmDbContext>(options =>
+builder.Services.AddDbContext<PointsDbContext>(options =>
        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
 
-}).AddEntityFrameworkStores<CrmDbContext>().AddDefaultTokenProviders();
+}).AddEntityFrameworkStores<PointsDbContext>().AddDefaultTokenProviders();
 
 builder.Services.ConfigureApplicationCookie(options =>
 {

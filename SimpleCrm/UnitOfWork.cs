@@ -7,9 +7,9 @@ using SimpleCrm.Repositories;
 
 namespace SimpleCrm
 {
-    public class UnitOfWork(CrmDbContext context) : IUnitOfWork
+    public class UnitOfWork(PointsDbContext context) : IUnitOfWork
     {
-        private readonly CrmDbContext _context = context;
+        private readonly PointsDbContext _context = context;
         private Hashtable _repositories;
 
 

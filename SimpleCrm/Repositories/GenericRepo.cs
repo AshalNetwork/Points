@@ -6,9 +6,9 @@ using SimpleCrm.Contexts;
 
 namespace SimpleCrm.Repositories
 {
-    public class GenericRepo<T>(CrmDbContext context) : IGenericRepo<T> where T : class
+    public class GenericRepo<T>(PointsDbContext context) : IGenericRepo<T> where T : class
     {
-        private readonly CrmDbContext _context = context;
+        private readonly PointsDbContext _context = context;
 
 
         public async Task<IReadOnlyList<T>> GetAllAsync()
