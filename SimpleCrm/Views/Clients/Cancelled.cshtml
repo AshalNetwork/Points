@@ -1,0 +1,138 @@
+﻿@model SimpleCrm.VM.PaginatedViewModel<SimpleCrm.VM.ClientsToReturnDto>
+@{
+    ViewData["Title"] = "Deleted Clients";
+}
+<div class="text-center">
+    <h1 class="text-center mb-5">Our <span class="text-danger">Deleted</span> Clients</h1>
+    <div class="row">
+        <div class="col-md-3 col-sm-12">
+        </div>
+        <div class="col-md-5 col-sm-0"></div>
+        <div class="col-md-4 col-sm-12">
+            <form method="get" class="d-flex" style="margin-bottom: 20px;">
+                <input class="form-control me-2" type="search" placeholder="Search" name="searchQuery" aria-label="Search" id="searchInput">
+
+                <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+        </div>
+    </div>
+    <table class="table table-bordered table-hover table-responsive">
+        <thead class="text-center bg-black text-white">
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Phone</th>                
+                <th scope="col">Description</th>                
+                <th scope="col">Reason</th>
+                <th scope="col">CreatedAt</th>
+                <th scope="col">UpdatedAt</th>
+                <th scope="col">Created By</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var client in Model.Items)
+            {
+                <tr class="client-row">
+                    <td>@client.Name</td>
+                    <td><a href="https://wa.me/@client.Phone">@client.Phone</a> </td>                    
+                    <td>@client.Description</td>
+                    <td>@client.Reason</td>
+                    <td>@client.CreatedAt</td>
+                    <td>@client.UpdatedAt</td>
+                    <td>@client.CreatedBy</td>
+                    <td class="text-center buttons">
+                        <button class="btn btn-success" id="follow-@client.Id" onclick="followClient('@client.Id')">Follow</button>
+                        <a asp-action="Edit" asp-route-id="@client.Id" class="btn btn-primary">Edit</a>
+                    </td>
+                </tr>
+            }
+
+
+        </tbody>
+    </table>
+ 
+    <div class="pagination-controls">
+        <!-- Previous Button -->
+        @if (Model.HasPreviousPage)
+        {
+            <a asp-action="Cancelled" asp-route-pageNumber="@(Model.PageNumber - 1)" class="btn btn-success">Previous</a>
+        }
+        else
+        {
+            <span class="disabled btn btn-success">Previous</span>
+        }
+
+        <!-- Arrow to Previous Set of Pages -->
+        @if (Model.StartPage > 1)
+        {
+            <a asp-action="Cancelled" asp-route-pageNumber="@(Model.StartPage - 1)" class="btn btn-success">&laquo;</a>
+        }
+
+        <!-- Page Numbers (1-10, 11-20, etc.) -->
+        @for (int i = Model.StartPage; i <= Model.EndPage; i++)
+        {
+            <a asp-action="Cancelled" asp-route-pageNumber="@i" class="@(Model.PageNumber == i ? "active btn btn-success" : "btn btn-success")">@i</a>
+        }
+
+        <!-- Arrow to Next Set of Pages -->
+        @if (Model.EndPage < Model.TotalPages)
+        {
+            <a asp-action="Cancelled" asp-route-pageNumber="@(Model.EndPage + 1)" class="btn btn-success">&raquo;</a>
+        }
+
+        <!-- Next Button -->
+        @if (Model.HasNextPage)
+        {
+            <a asp-action="Cancelled" asp-route-pageNumber="@(Model.PageNumber + 1)" class="btn btn-success">Next</a>
+        }
+        else
+        {
+            <span class="disabled btn btn-success">Next</span>
+        }
+    </div>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function followClient(clientId) {
+        $.ajax({
+            url: '/Clients/Follow/' + clientId,
+            type: 'PUT',
+            success: function (result) {
+                refreshClientTable();
+                toastr.success('Client Activated successfully!', 'Success', { timeOut: 5000 })
+            },
+            error: function (xhr, status, error) {
+                toastr.error('Failed to delete client!', 'error', { timeOut: 5000 })
+            }
+        });
+    }
+
+    function refreshClientTable() {
+        $.ajax({
+            url: '@Url.Action("Cancelled", "Clients")',
+            type: 'GET',
+            //data: { /* you can send additional data here if needed */ },
+            success: function (result) {
+                $('table tbody').html($(result).find('table tbody').html());
+            },
+            error: function (xhr, status, error) {
+                console.error("Failed to refresh the client table: ", error);
+                alert("An error occurred while refreshing the table.");
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        // Listen for keyup event on the search input
+        $('#searchInput').on('keyup', function () {
+            var searchTerm = $(this).val().toLowerCase(); // Get the search term and convert to lowercase
+
+            // Loop through all table rows and hide those that don't match the search term
+            $('.client-row').filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(searchTerm) > -1);
+            });
+        });
+    });
+</script>

@@ -1,0 +1,233 @@
+﻿@model SimpleCrm.VM.PaginatedViewModel<SimpleCrm.VM.ClientsToReturnDto>
+@{
+    ViewData["Title"] = "Active Clients";
+    var users = ViewBag.users;
+}
+
+<div>
+    <h1 class="text-center mb-5">Our <span class="text-success">Active</span> Clients</h1>
+    <div class="row mb-2">
+         <div class="col-md-6 col-sm-12">
+            <div class="btn-group">
+                <a class="btn btn-success" aria-current="page" asp-controller="Clients" asp-action="Add"><i class="bi bi-plus"></i>Add Client</a>
+                <a class="btn btn-success" asp-action="Index" asp-controller="Clients">All Clients</a> 
+            </div>
+         </div>
+        <div class="col-md-2 col-sm-0"></div>
+        <div class="col-md-4 col-sm-12">
+            <form method="get" class="d-flex">
+                <input class="form-control me-2 " type="search" placeholder="Search" name="searchQuery" aria-label="Search" id="searchInput">
+                <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+        </div>
+    </div>
+
+    <table class="table table-bordered table-hover table-responsive">
+        <thead class="text-center bg-black text-white">
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Phone</th>
+                <th scope="col">Description</th>
+                <th scope="col">Reason</th>
+                <th scope="col">CreatedAt</th>
+                <th scope="col">UpdatedAt</th>
+                <th scope="col">Created By</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var client in Model.Items)
+            {
+                <tr class="client-row">
+                    <td>@client.Name</td>
+                    <td><a href="https://wa.me/@client.Phone">@client.Phone</a> </td>
+                    <td>@client.Description</td>
+                    <td>@client.Reason</td>
+                    <td>@client.CreatedAt</td>
+                    <td>@client.UpdatedAt</td>
+                    <td>@client.CreatedBy</td>
+                    <td class="text-center buttons">
+                        <button class="btn btn-danger" id="delete-@client.Id" onclick="deleteClient('@client.Id')"><i class="bi bi-trash"></i> Delete</button>
+
+                        <a asp-action="Edit" asp-route-id="@client.Id" class="btn btn-primary"><i class="bi bi-pencil"></i> Edit</a>
+
+                        <button type="button" class="btn btn-primary"
+                                data-bs-toggle="modal"
+                                data-bs-target="#exampleModal"
+                                data-client-id="@client.Id"
+                                data-createdby="@client.UserId">
+                            <i class="bi bi-arrow-repeat"></i> Forward
+                        </button>
+
+                    </td>
+                </tr>
+            }
+           
+           
+        </tbody>
+    </table>
+    <div class="pagination-controls">
+        <!-- Previous Button -->
+        @if (Model.HasPreviousPage)
+        {
+            <a asp-action="Index" asp-route-pageNumber="@(Model.PageNumber - 1)" class="btn btn-success">Previous</a>
+        }
+        else
+        {
+            <span class="disabled btn btn-success">Previous</span>
+        }
+
+        <!-- Arrow to Previous Set of Pages -->
+        @if (Model.StartPage > 1)
+        {
+            <a asp-action="Index" asp-route-pageNumber="@(Model.StartPage - 1)" class="btn btn-success">&laquo;</a>
+        }
+
+        <!-- Page Numbers (1-10, 11-20, etc.) -->
+        @for (int i = Model.StartPage; i <= Model.EndPage; i++)
+        {
+            <a asp-action="Index" asp-route-pageNumber="@i" class="@(Model.PageNumber == i ? "active btn btn-success" : "btn btn-success")">@i</a>
+        }
+
+        <!-- Arrow to Next Set of Pages -->
+        @if (Model.EndPage < Model.TotalPages)
+        {
+            <a asp-action="Index" asp-route-pageNumber="@(Model.EndPage + 1)" class="btn btn-success">&raquo;</a>
+        }
+
+        <!-- Next Button -->
+        @if (Model.HasNextPage)
+        {
+            <a asp-action="Index" asp-route-pageNumber="@(Model.PageNumber + 1)" class="btn btn-success">Next</a>
+        }
+        else
+        {
+            <span class="disabled btn btn-success">Next</span>
+        }
+    </div>
+    
+</div>
+
+
+<!---------------Pop Up----------------------->
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Select User</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="forwardClientForm" asp-action="ForwardClient" method="post">
+                    <input type="hidden" id="ClientId" name="ClientId" />
+                    <input type="hidden" id="CreatedBy" name="CreatedBy" /> 
+                    <div class="form-group">
+                        <label for="ForwardedToUserId">Select User:</label>
+                        <select id="ForwardedToUserId" name="ForwardedToUserId" class="form-control" required>
+                            <option value="">-- Select a User --</option>
+                            @foreach (var user in users)
+                            {
+                                <option value="@user.Id">@user.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-2">Forward Client</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function deleteClient(clientId) {
+        $.ajax({
+            url: '/Clients/Delete/' + clientId,
+            type: 'PUT',
+            success: function (result) {
+                refreshClientTable();
+                toastr.success('Client deleted successfully!', 'Success', { timeOut: 5000 })
+            },
+            error: function (xhr, status, error) {
+                toastr.error('Failed to delete client!', 'error', { timeOut: 5000 })
+            }
+        });
+    }
+    function refreshClientTable() {
+        $.ajax({
+            url: '@Url.Action("Index", "Clients")',
+            type: 'GET',
+            success: function (result) {
+                $('table tbody').html($(result).find('table tbody').html());
+            },
+            error: function (xhr, status, error) {
+                console.error("Failed to refresh the client table: ", error);
+                alert("An error occurred while refreshing the table.");
+            }
+        });
+    }
+    $(document).ready(function () {
+        // When the modal is shown, populate the ClientId field
+        $('#exampleModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget); // Button that triggered the modal
+            var clientId = button.data('client-id');
+            var createdBy = button.data('createdby');
+            var modal = $(this);
+            modal.find('#ClientId').val(clientId); 
+            modal.find('#CreatedBy').val(createdBy);
+            filterDropdownByCreatedBy(createdBy);
+        });
+
+        $('#forwardClientForm').on('submit', function (event) {
+            event.preventDefault(); // Prevent default form submission
+            var formData = $(this).serialize(); // Serialize form data
+
+            $.ajax({
+                url: '@Url.Action("ForwardClient", "Clients")', // Replace with your endpoint action
+                type: 'POST',
+                data: formData,
+                success: function (result) {
+                    // Handle success (e.g., show a success message or close the modal)
+                    alert('Client forwarded successfully!');
+                    $('#exampleModal').modal('hide'); // Close the modal
+                    location.reload(); // Optionally reload the page to reflect changes
+                },
+                error: function (error) {
+                    // Handle error (e.g., show an error message)
+                    alert('Error forwarding the client. Please try again.');
+                }
+            });
+        });
+
+
+        // live filtration 
+        $('#searchInput').on('keyup', function () {
+            var searchTerm = $(this).val().toLowerCase(); // Get the search term and convert to lowercase
+
+            // Loop through all table rows and hide those that don't match the search term
+            $('.client-row').filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(searchTerm) > -1);
+            });
+        });
+
+    });
+    function filterDropdownByCreatedBy(createdBy) {
+        $('#ForwardedToUserId option').each(function () {
+            var userId = $(this).val(); // Get user Id from each option
+            if (userId !== createdBy) {
+                $(this).show(); // Show option if it does not matches CreatedBy
+            } else {
+                $(this).hide(); // Hide option if it match
+            }
+        });
+    }
+</script>
+
+
+

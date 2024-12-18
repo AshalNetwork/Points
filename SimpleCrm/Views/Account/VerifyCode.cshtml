@@ -1,0 +1,19 @@
+﻿@model SimpleCrm.VM.VerifyCodeVm
+
+<h2 class="text-center">VerifyCode</h2>
+
+<form asp-action="VerifyCode" method="post">
+    <input type="text" name="userId" value="@ViewBag.userId" />
+
+    <div class="form-group">
+        <label asp-for="Code"></label>
+        <input asp-for="Code" class="form-control" />
+        <span asp-validation-for="Code" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Reset Password</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

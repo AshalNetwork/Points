@@ -1,0 +1,106 @@
+﻿@model IEnumerable<SimpleCrm.VM.UsersVm>
+@{
+    ViewData["Title"] = "Users";
+}
+<div>
+    <h1 class="text-center">All Users</h1>
+    <div class="row mb-2">
+        <div class="col-md-6 col-sm-12">
+            <div class="btn-group">
+                <a class="btn btn-success" aria-current="page" asp-action="Register"><i class="bi bi-plus"></i>Add User</a>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-0"></div>
+       
+    </div>
+  
+
+    <table class="table table-bordered table-hover table-responsive">
+        <thead class="text-center bg-black text-white">
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Email</th>
+                <th scope="col">Phone</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td>@user.Name</td>
+                    <td>@user.Email</td>
+                    <td>@user.Phone</td>
+                    
+                    <td>
+                        @if (user.Role=="User")
+                        {
+
+                            <button onclick="deleteClient('@user.Id')" class="btn btn-outline-danger" type="button"><i class="bi bi-trash"></i> Delete</button>
+                            
+                        }
+                    </td>
+                    
+                </tr>
+            }
+           
+           
+        </tbody>
+    </table>
+  
+</div>
+
+ @section Scripts{
+ <script>
+     function deleteClient(clientId)
+     { 
+            // Show confirmation dialog
+            $.confirm({
+                title: 'Confirm Delete',
+                content: 'By deleting this user, their clients will be deleted as well. Are you sure you want to delete?',
+                buttons: {
+                    confirm: {
+                        text: 'Confirm',
+                        btnClass: 'btn-danger',
+                        action: function () {
+                            // AJAX request
+                            $.ajax({
+                                url: '/Account/DeleteAccount?UserId=' + clientId,
+                                type: 'post',
+                                success: function (response) {
+
+                                    refreshClientTable(); // Optionally, reload the page
+                                    toastr.success('Account deleted successfully!', 'Success', { timeOut: 5000 })
+
+                                },
+                                error: function (xhr, status, error) {
+                                    console.log("Error:", error);  // Log the error for debugging
+                                    toastr.error('An error occurred while deleting the account.', 'Error!')
+                                }
+                            });
+                        }
+                    },
+                    cancel: function () {
+                        
+                    }
+                }
+            });
+    };
+
+        function refreshClientTable() {
+            $.ajax({
+                url: '@Url.Action("Index", "Users")',
+                type: 'GET',
+                //data: { /* you can send additional data here if needed */ },
+                success: function (result) {
+                    $('table tbody').html($(result).find('table tbody').html());
+                },
+                error: function (xhr, status, error) {
+                    console.error("Failed to refresh the client table: ", error);
+                    alert("An error occurred while refreshing the table.");
+                }
+            });
+        }
+
+</script> 
+}
