@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using SimpleCrm.Enums;
 using SimpleCrm.Models;
 
 namespace SimpleCrm.Contexts
@@ -10,26 +11,24 @@ namespace SimpleCrm.Contexts
             var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-            var adminRole = "User";
+            var Role = RolesEnum.ProductionMangerB.ToString();
 
             // Ensure the admin role exists
-            if (!await roleManager.RoleExistsAsync(adminRole))
+            if (!await roleManager.RoleExistsAsync(Role))
             {
-                await roleManager.CreateAsync(new IdentityRole(adminRole));
+                await roleManager.CreateAsync(new IdentityRole(Role));
             }
-            // userName MohamedMarey11@gmail.com  pass Marey#159
-            // userName amasser@myfatoorah.com  pass Amasser#185
-            // userName mostafa102@gmail.com pass Mostafa#105
+
             // Seed a user
-            var defaultUser = new ApplicationUser { UserName = "mostafa102@gmail.com", Email = "mostafa102@gmail.com", EmailConfirmed = true };
+            var defaultUser = new ApplicationUser {Name="Hossam Elganiny", UserName = "hossamelsayed676@gmail.com", Email = "hossamelsayed676@gmail.com", EmailConfirmed = true };
 
             if (userManager.Users.All(u => u.UserName != defaultUser.UserName))
             {
-                var result = await userManager.CreateAsync(defaultUser, "Mostafa#105");
+                var result = await userManager.CreateAsync(defaultUser, "Hossam#105");
 
                 if (result.Succeeded)
                 {
-                    await userManager.AddToRoleAsync(defaultUser, adminRole);
+                    await userManager.AddToRoleAsync(defaultUser, Role);
                 }
             }
         }

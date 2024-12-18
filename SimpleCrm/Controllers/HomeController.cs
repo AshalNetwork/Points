@@ -23,14 +23,8 @@ namespace SimpleCrm.Controllers
 
         public async Task<ActionResult> Index()
         {
-            var modal = new StaticticsVM
-            {
-                UsersCount = _userManager.Users.Count(),
-                ActiveClients = await _unitOfWork.Repository<Clients>().CountAsync(z => z.Status == Enums.ClientStatusEnum.Following),
-                DeletedClients = await _unitOfWork.Repository<Clients>().CountAsync(z => z.Status == Enums.ClientStatusEnum.Deleted),
-                Forwards = await _unitOfWork.Repository<FollowedClient>().CountAsync(z=>z.Id!=Guid.Empty)
-            };
-            return View(modal);
+           
+            return View();
         }
 
         public IActionResult Privacy()

@@ -36,8 +36,31 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 var emailConfig = builder.Configuration.GetSection("EmailConfiguration").Get<EmailSettings>();
 builder.Services.AddSingleton(emailConfig);
 var app = builder.Build();
+#region Migrate database
 
-using (var scope = app.Services.CreateScope())
+using var scope = app.Services.CreateScope();
+
+var services = scope.ServiceProvider;
+
+var loggerFactory = services.GetRequiredService<ILoggerFactory>();
+
+try
+{
+
+    var dbContext = services.GetRequiredService<PointsDbContext>();
+
+    dbContext.Database.Migrate();
+    await SeedData.InitializeAsync(services);
+
+}
+catch (Exception ex)
+{
+    var logger = loggerFactory.CreateLogger<Program>();
+    logger.LogError(ex, ex.Message);
+}
+
+#endregion
+/*using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
@@ -49,7 +72,7 @@ using (var scope = app.Services.CreateScope())
         // Handle errors here
         Console.WriteLine(ex.Message);
     }
-}
+}*/
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {

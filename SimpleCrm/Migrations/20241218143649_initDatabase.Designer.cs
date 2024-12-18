@@ -12,8 +12,8 @@ using SimpleCrm.Contexts;
 namespace SimpleCrm.Migrations
 {
     [DbContext(typeof(PointsDbContext))]
-    [Migration("20240930085810_AddCommingReason")]
-    partial class AddCommingReason
+    [Migration("20241218143649_initDatabase")]
+    partial class initDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -183,6 +183,10 @@ namespace SimpleCrm.Migrations
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -221,67 +225,6 @@ namespace SimpleCrm.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("SimpleCrm.Models.Clients", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ClientName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClientPhone")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("CommingReasonId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CustomReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CommingReasonId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Clients");
-                });
-
-            modelBuilder.Entity("SimpleCrm.Models.CommingReason", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Reason")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("CommingReasons");
                 });
 
             modelBuilder.Entity("SimpleCrm.Models.ValidationCode", b =>
@@ -358,33 +301,6 @@ namespace SimpleCrm.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("SimpleCrm.Models.Clients", b =>
-                {
-                    b.HasOne("SimpleCrm.Models.CommingReason", "CommingReason")
-                        .WithMany("Clients")
-                        .HasForeignKey("CommingReasonId");
-
-                    b.HasOne("SimpleCrm.Models.ApplicationUser", "User")
-                        .WithMany("Clients")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CommingReason");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("SimpleCrm.Models.ApplicationUser", b =>
-                {
-                    b.Navigation("Clients");
-                });
-
-            modelBuilder.Entity("SimpleCrm.Models.CommingReason", b =>
-                {
-                    b.Navigation("Clients");
                 });
 #pragma warning restore 612, 618
         }

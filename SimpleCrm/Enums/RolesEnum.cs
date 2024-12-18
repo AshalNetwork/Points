@@ -2,7 +2,9 @@
 {
     public enum RolesEnum
     {
-        Admin,
-        User
+        ProductionMangerA=1,
+        ProductionMangerB=2,
+        OperationManger=3,
+        Employee = 4
     }
 }
