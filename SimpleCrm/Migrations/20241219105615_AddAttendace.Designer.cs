@@ -7,14 +7,13 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SimpleCrm.Contexts;
 
-
 #nullable disable
 
 namespace SimpleCrm.Migrations
 {
     [DbContext(typeof(PointsDbContext))]
-    [Migration("20241218143649_initDatabase")]
-    partial class initDatabase
+    [Migration("20241219105615_AddAttendace")]
+    partial class AddAttendace
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -228,6 +227,53 @@ namespace SimpleCrm.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("SimpleCrm.Models.Attendance", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ApplicationUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<TimeSpan>("CheckIn")
+                        .HasColumnType("time");
+
+                    b.Property<TimeSpan>("CheckOut")
+                        .HasColumnType("time");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.ToTable("Attendances");
+                });
+
+            modelBuilder.Entity("SimpleCrm.Models.PointsValue", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Percentage")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Value")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PointsValues");
+                });
+
             modelBuilder.Entity("SimpleCrm.Models.ValidationCode", b =>
                 {
                     b.Property<Guid>("Id")
@@ -302,6 +348,22 @@ namespace SimpleCrm.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("SimpleCrm.Models.Attendance", b =>
+                {
+                    b.HasOne("SimpleCrm.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany("Clients")
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+                });
+
+            modelBuilder.Entity("SimpleCrm.Models.ApplicationUser", b =>
+                {
+                    b.Navigation("Clients");
                 });
 #pragma warning restore 612, 618
         }

@@ -20,7 +20,7 @@ namespace SimpleCrm.Contexts
             }
 
             // Seed a user
-            var defaultUser = new ApplicationUser {Name="Hossam Elganiny", UserName = "hossamelsayed676@gmail.com", Email = "hossamelsayed676@gmail.com", EmailConfirmed = true };
+            var defaultUser = new ApplicationUser { Name = "Hossam Elganiny", UserName = "hossamelsayed676@gmail.com", Email = "hossamelsayed676@gmail.com", EmailConfirmed = true };
 
             if (userManager.Users.All(u => u.UserName != defaultUser.UserName))
             {
