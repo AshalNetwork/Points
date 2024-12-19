@@ -59,8 +59,8 @@ namespace SimpleCrm.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            /*if (ModelState.IsValid)
-            {*/
+            if (ModelState.IsValid)
+            {
                 var user = new ApplicationUser { Name = model.Name,UserName = model.Email, Email = model.Email, PhoneNumber = model.PhoneNumber };
                 var result = await _userManager.CreateAsync(user, model.Password);
 
@@ -74,8 +74,7 @@ namespace SimpleCrm.Controllers
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
-           // }
-
+            }
             return View(model);
         }
     }

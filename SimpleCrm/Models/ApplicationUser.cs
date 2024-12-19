@@ -5,7 +5,7 @@ namespace SimpleCrm.Models
     public class ApplicationUser: IdentityUser
     {
         public string Name { get; set; }
-        //public ICollection<Clients> Clients { get; set; } = new HashSet<Clients>();
+        public ICollection<Tasks> Tasks { get; set; } = new HashSet<Tasks>();
 
     }
 }

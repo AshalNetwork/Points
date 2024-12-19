@@ -40,13 +40,18 @@ namespace SimpleCrm.Controllers
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-
+                    
                     if (string.IsNullOrEmpty(returnUrl) || !Url.IsLocalUrl(returnUrl))
                     {
                         if (!User.IsInRole(RolesEnum.Employee.ToString()))
                         {
                             return RedirectToAction("Index", "Users");
                         }
+                        else
+                        {
+                            return RedirectToAction("UserTasks", "Tasks");
+                        }
+
                     }
                     
                     return Redirect(returnUrl);

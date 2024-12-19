@@ -1,0 +1,33 @@
+﻿@model IEnumerable<SimpleCrm.VM.GetMyDailyTasksVM>
+@{
+    ViewData["Title"] = "Today Tasks";
+}
+<h1 class="text-center mt-5">My Tasks</h1>
+<div class="row">
+    
+@foreach (var item in Model)
+{
+      <div class="col-sm-12 col-md-3">
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                <p class="d-none">@item.Id</p>
+                <h5 class="card-title text-center"> @item.Title</h5>
+                <p class="card-text">@item.Description</p>
+                <p class="card-text">DeadLine: @item.EndDate
+                    @if (item.Status == "Pending")
+                    {
+                        <span class="text-info"> @item.Status</span>
+                    }
+                    @if (item.Status == "InProgress")
+                    {
+                        <span class="text-primary"> @item.Status</span>
+                    }
+
+                </p>
+                <a href="#" class="card-link">Completed</a>
+                <a href="#" class="card-link">InProgress</a>
+            </div>
+        </div>
+      </div>
+}
+</div>

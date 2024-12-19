@@ -14,7 +14,7 @@ namespace SimpleCrm.VM
         public string Email { get; set; }
         [Required]
         public RolesEnum Role { get; set; }
-        public ICollection<SelectListItem> RolesList { get; set; }
+        public ICollection<SelectListItem>? RolesList { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
