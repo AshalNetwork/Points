@@ -87,13 +87,13 @@ app.UseRouting();
 
 app.UseAuthentication(); // Added for Identity
 app.UseAuthorization();
-//app.MapControllerRoute(
-//    name: "default",
-//    pattern: "{controller=Home}/{action=Index}/{id?}");
-
 app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+/*app.MapControllerRoute(
         name: "pagination",
         pattern: "Page/{pageNumber}",
-        defaults: new { Controller = "Home", Action = "Index" });
+        defaults: new { Controller = "Home", Action = "Index" });*/
 
 app.Run();
