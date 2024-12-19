@@ -21,6 +21,7 @@
                 <th scope="col">Name</th>
                 <th scope="col">Email</th>
                 <th scope="col">Phone</th>
+                <th scope="col">Role</th>
                 <th scope="col">Action</th>
             </tr>
         </thead>
@@ -31,13 +32,12 @@
                     <td>@user.Name</td>
                     <td>@user.Email</td>
                     <td>@user.Phone</td>
+                    <td>@user.Role</td>
                     
                     <td>
-                        @if (user.Role=="User")
+                        @if (user.Role=="Employee")
                         {
-
-                            <button onclick="deleteClient('@user.Id')" class="btn btn-outline-danger" type="button"><i class="bi bi-trash"></i> Delete</button>
-                            
+                            <button onclick="deleteClient('@user.Id')" class="btn btn-outline-danger" type="button"><i class="bi bi-trash"></i> Delete</button>                            
                         }
                     </td>
                     

@@ -6,7 +6,7 @@ namespace SimpleCrm.Contexts
 {
     public static class SeedData
     {
-        public static async Task InitializeAsync(IServiceProvider serviceProvider)
+        public static async Task InitializeUsersAsync(IServiceProvider serviceProvider)
         {
             var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();

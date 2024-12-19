@@ -26,9 +26,9 @@
         {
             <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
                 <div class="container-fluid">
-                    @if (User.IsInRole("Admin"))
+                    @if (!User.IsInRole("Employee"))
                     {
-                        <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Ashal</a>
+                        <a class="navbar-brand" asp-area="" asp-controller="Users" asp-action="Index">Ashal</a>
                     }
                     else
                     {
@@ -52,10 +52,7 @@
                                 {
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">Users</a>
                                 }
-                                @if (User.IsInRole("Admin"))
-                                {
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="FollowedClients" asp-action="Index">Followed Clients</a>
-                                }
+
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Clients" asp-action="Index">Active Clients</a>
                                 </li>
@@ -77,7 +74,7 @@
                                         <li>
                                             <a class="dropdown-item text-dark" asp-area="" asp-controller="Account" asp-action="ChangePassword"><i class="bi bi-key"></i> Change Password</a>
                                         </li>
-                                        @if (User.IsInRole("Admin"))
+                                        @if (!User.IsInRole("Emplyee "))
                                         {
                                             <a class="dropdown-item text-dark" asp-area="" asp-action="ExportClientsToExcel" asp-controller="Clients"><i class="bi bi-file-spreadsheet"></i> Export Clients</a>
                                         }

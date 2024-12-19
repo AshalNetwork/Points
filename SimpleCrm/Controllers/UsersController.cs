@@ -1,14 +1,16 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using SimpleCrm.Contexts;
+using SimpleCrm.Enums;
 using SimpleCrm.IRepository;
 using SimpleCrm.Models;
 using SimpleCrm.VM;
 
 namespace SimpleCrm.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class UsersController(SignInManager<ApplicationUser> signInManager,UserManager<ApplicationUser> userManager,IUnitOfWork unitOfWork, PointsDbContext context, ILogger<UsersController> logger) : Controller
     {
         private readonly ILogger<UsersController> _logger = logger;
@@ -39,21 +41,32 @@ namespace SimpleCrm.Controllers
         }
         public IActionResult Register()
         {
-            return View();
+            var model = new RegisterViewModel
+            {
+                RolesList = Enum.GetValues(typeof(RolesEnum))
+                   .Cast<RolesEnum>()
+                   .Select(g => new SelectListItem
+                   {
+                       Value = ((int)g).ToString(),
+                       Text = g.ToString()
+                   }).ToList()
+            };
+
+            return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            if (ModelState.IsValid)
-            {
+            /*if (ModelState.IsValid)
+            {*/
                 var user = new ApplicationUser { Name = model.Name,UserName = model.Email, Email = model.Email, PhoneNumber = model.PhoneNumber };
                 var result = await _userManager.CreateAsync(user, model.Password);
 
                 if (result.Succeeded)
                 {
-                    await _userManager.AddToRoleAsync(user, "User");
+                    await _userManager.AddToRoleAsync(user, model.Role.ToString());
                     return RedirectToAction("Index", "Users");
                 }
 
@@ -61,7 +74,7 @@ namespace SimpleCrm.Controllers
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
-            }
+           // }
 
             return View(model);
         }

@@ -1,4 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using DocumentFormat.OpenXml.Drawing.Diagrams;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using SimpleCrm.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace SimpleCrm.VM
 {
@@ -9,6 +12,9 @@ namespace SimpleCrm.VM
         [Required]
         [EmailAddress]
         public string Email { get; set; }
+        [Required]
+        public RolesEnum Role { get; set; }
+        public ICollection<SelectListItem> RolesList { get; set; }
 
         [Required]
         [DataType(DataType.Password)]

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using SimpleCrm.Enums;
 using SimpleCrm.IRepository;
 using SimpleCrm.Models;
 using SimpleCrm.Service;
@@ -42,13 +43,9 @@ namespace SimpleCrm.Controllers
 
                     if (string.IsNullOrEmpty(returnUrl) || !Url.IsLocalUrl(returnUrl))
                     {
-                        if (User.IsInRole("Admin"))
+                        if (!User.IsInRole(RolesEnum.Employee.ToString()))
                         {
-                            return RedirectToAction("Index", "Home");
-                        }
-                        else
-                        {
-                            return RedirectToAction("Index", "Clients");
+                            return RedirectToAction("Index", "Users");
                         }
                     }
                     
@@ -200,9 +197,9 @@ namespace SimpleCrm.Controllers
             {
                 return View();
             }
-            var follower = await _unitOfWork.Repository<FollowedClient>().GetAllWithSpecAsync(new BaseSpecification<FollowedClient>(z => z.ToId == UserId || z.FromId == UserId));
-            _unitOfWork.Repository<FollowedClient>().DeleteRange(follower.ToList());
-            await _unitOfWork.Complete();
+           // var follower = await _unitOfWork.Repository<FollowedClient>().GetAllWithSpecAsync(new BaseSpecification<FollowedClient>(z => z.ToId == UserId || z.FromId == UserId));
+           // _unitOfWork.Repository<FollowedClient>().DeleteRange(follower.ToList());
+           // await _unitOfWork.Complete();
             // Delete user account
             var result = await _userManager.DeleteAsync(user);
             if (!result.Succeeded)

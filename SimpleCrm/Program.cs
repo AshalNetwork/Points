@@ -50,7 +50,7 @@ try
     var dbContext = services.GetRequiredService<PointsDbContext>();
 
     dbContext.Database.Migrate();
-    await SeedData.InitializeAsync(services);
+    await SeedData.InitializeUsersAsync(services);
 
 }
 catch (Exception ex)
