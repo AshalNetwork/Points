@@ -1,5 +1,4 @@
-﻿using SimpleCrm.Migrations;
-
+﻿
 namespace SimpleCrm.Specification
 {
     public class GetAllTasksSpec:BaseSpecification<Models.Tasks>

@@ -12,8 +12,8 @@ using SimpleCrm.Contexts;
 namespace SimpleCrm.Migrations
 {
     [DbContext(typeof(PointsDbContext))]
-    [Migration("20241219081340_Tasks")]
-    partial class Tasks
+    [Migration("20241219110926_InitDatabase")]
+    partial class InitDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -227,6 +227,32 @@ namespace SimpleCrm.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("SimpleCrm.Models.Attendance", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ApplicationUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<TimeSpan>("CheckIn")
+                        .HasColumnType("time");
+
+                    b.Property<TimeSpan>("CheckOut")
+                        .HasColumnType("time");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.ToTable("Attendance");
+                });
+
             modelBuilder.Entity("SimpleCrm.Models.PointsValue", b =>
                 {
                     b.Property<Guid>("Id")
@@ -357,6 +383,17 @@ namespace SimpleCrm.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("SimpleCrm.Models.Attendance", b =>
+                {
+                    b.HasOne("SimpleCrm.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany("Attendances")
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+                });
+
             modelBuilder.Entity("SimpleCrm.Models.Tasks", b =>
                 {
                     b.HasOne("SimpleCrm.Models.ApplicationUser", "User")
@@ -370,6 +407,8 @@ namespace SimpleCrm.Migrations
 
             modelBuilder.Entity("SimpleCrm.Models.ApplicationUser", b =>
                 {
+                    b.Navigation("Attendances");
+
                     b.Navigation("Tasks");
                 });
 #pragma warning restore 612, 618
