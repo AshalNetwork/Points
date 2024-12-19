@@ -6,6 +6,7 @@ namespace SimpleCrm.Models
     {
         public string Name { get; set; }
         //public ICollection<Clients> Clients { get; set; } = new HashSet<Clients>();
+        public ICollection<Attendance> Clients { get; set; } = new HashSet<Attendance>();
 
     }
 }

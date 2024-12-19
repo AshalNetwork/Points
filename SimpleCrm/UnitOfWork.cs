@@ -1,8 +1,8 @@
 ﻿using SimpleCrm.IRepository;
 using Microsoft.EntityFrameworkCore;
-using SimpleCrm.Contexts;
 using System.Collections;
 using SimpleCrm.Repositories;
+using SimpleCrm.Contexts;
 
 
 namespace SimpleCrm

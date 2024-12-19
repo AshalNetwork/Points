@@ -1,8 +1,7 @@
 using ashal.Services;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.Extensions.Configuration;
 using SimpleCrm;
 using SimpleCrm.Contexts;
 using SimpleCrm.IRepository;
@@ -33,7 +32,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
-var emailConfig = builder.Configuration.GetSection("EmailConfiguration").Get<EmailSettings>();
+var emailConfig = builder.Configuration.GetSection("EmailConfiguration").Get<EmailSettings>()!;
 builder.Services.AddSingleton(emailConfig);
 var app = builder.Build();
 #region Migrate database
@@ -88,18 +87,13 @@ app.UseRouting();
 
 app.UseAuthentication(); // Added for Identity
 app.UseAuthorization();
-/*app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");*/
+//app.MapControllerRoute(
+//    name: "default",
+//    pattern: "{controller=Home}/{action=Index}/{id?}");
 
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllerRoute(
+app.MapControllerRoute(
         name: "pagination",
         pattern: "Page/{pageNumber}",
         defaults: new { Controller = "Home", Action = "Index" });
-
-    endpoints.MapDefaultControllerRoute();
-});
 
 app.Run();
