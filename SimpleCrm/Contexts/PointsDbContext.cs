@@ -13,6 +13,8 @@ namespace SimpleCrm.Contexts
         }
         public DbSet<ValidationCode> ValidationCodes { get; set; }
         public DbSet<PointsValue> PointsValues { get; set; }
+        public DbSet<Tasks> Tasks { get; set; }
+        public DbSet<Attendance> Attendance { get; set; }
         
     }
 }
