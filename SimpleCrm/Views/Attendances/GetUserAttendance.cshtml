@@ -1,20 +1,25 @@
 ﻿@model List<Attendance>
-<table class="text-center table table-bordered table-hover table-responsive mt-5">
-    <thead class="text-center bg-black text-white">
+@{
+    ViewData["Title"] = "Attendance";
+}
+<h1 class="text-center">User Attendance</h1>
+<table class="text-center table table-bordered table-hover table-responsive">
+    <thead class=" bg-black text-white">
         <tr>
-            <th scope="col">User</th>
+            <th scope="col">Date</th>
             <th scope="col">Check in</th>
             <th scope="col">Check out</th>
             <th scope="col">Late</th>
+
         </tr>
     </thead>
     <tbody>
         @foreach (var task in Model)
         {
             <tr>
-                <td scope="col">@task.ApplicationUser.Name</td>
-                <td scope="col">@task.CheckIn.Hours : @task.CheckIn.Minutes </td>
-                <td scope="col">@task.CheckOut.Hours : @task.CheckOut.Minutes</td>
+                <td>@task.Date.Day - @task.Date.Month - @task.Date.Year </td>
+                <td>@task.CheckIn.Hours : @task.CheckIn.Minutes</td>
+                <td>@task.CheckOut.Hours : @task.CheckOut.Minutes</td>
                 <td>
                     @{
                         var egyptTime = new TimeSpan(9, 0, 0);

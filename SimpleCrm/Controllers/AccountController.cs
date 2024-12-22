@@ -226,7 +226,7 @@ namespace SimpleCrm.Controllers
             var user = await _userManager.FindByIdAsync( User.Claims.FirstOrDefault()!.Value);
             if (user != null)
             {
-                var egyptTimeZoneId = "Egypt Standard Time";
+                  var egyptTimeZoneId = "Egypt Standard Time";
                 var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById(egyptTimeZoneId);
                 var egyptTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
                 var attendance=await _unitOfWork.Repository<Attendance>().GetBYPropAsync(new GetUserAttendanceSpec(user.Email, egyptTime.Date));

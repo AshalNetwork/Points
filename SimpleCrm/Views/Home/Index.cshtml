@@ -1,77 +1,68 @@
-﻿@model SimpleCrm.VM.StaticticsVM
+﻿@model List<Attendance>
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
 @{
-   // ViewData["Title"] = "Home";
+    var userId = Context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    ViewData["Title"] = "Home";
 }
 
-<style>
-    .card-icon {
-        font-size: 2rem;
-        color: #17a2b8; /* Customize icon color */
-    }
-
-    .card-number {
-        font-size: 2.5rem;
-        font-weight: bold;
-    }
-
-    .card {
-        text-align: center;
-        border: none;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional box shadow */
-        transition: transform 0.3s ease; /* Smooth hover effect */
-    }
-
-        .card:hover {
-            transform: translateY(-5px); /* Move card up on hover */
-        }
-</style>
-<div class="container py-5">
-    <h2 class="text-center mb-5">Home</h2>
-
-    <div class="row g-4">
-        <!-- Card 1 -->
-        <div class="col-md-3 col-sm-6">
-            <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">
-                <div class="card">
-                    <div class="card-body">
-                        <i class="bi bi-person card-icon"></i> Users
-                        <div class="card-number"></div>
+<h1 class="text-center">Today Attendance</h1>
+<div class="row mb-2">
+    <div class="col-md-6 col-sm-12">
+        <div class="btn-group">
+            @if (Model.Where(z => z.Date.Date == DateTime.Now.Date).Count() == 0)
+            {
+                <form asp-controller="Attendances" asp-action="Index" method="post" class="w-75 m-auto">
+                    @Html.AntiForgeryToken()
+                    <div class="form-group">
+                        <input type="hidden" name="UserId" value="@userId" />
                     </div>
-                </div>
-            </a>
-        </div>
-        <!-- Card 2 -->
-        <div class="col-md-3 col-sm-6">
-            <a class="nav-link text-dark" asp-area="" asp-controller="Clients" asp-action="Index">
-                <div class="card">
-                    <div class="card-body">
-                        <i class="bi bi-people card-icon"></i> Active Clients
-                        <div class="card-number"></div>
+                   
+                    <button type="submit" class="btn btn-primary mt-1">Exist</button>
+                </form>
+
+            }else if (Model.Where(z => z.Date.Date == DateTime.Now.Date && z.CheckOut == TimeSpan.Zero).Count() > 0)
+            {
+                <form asp-controller="Attendances" asp-action="Index" method="post" class="w-75 m-auto">
+                    @Html.AntiForgeryToken()
+                    <div class="form-group">
+                        <input type="hidden" name="UserId" value="@userId" />
                     </div>
-                </div>
-            </a>
-        </div>
-        <!-- Card 3 -->
-        <div class="col-md-3 col-sm-6">
-            <a class="nav-link text-dark" asp-area="" asp-controller="Clients" asp-action="Cancelled">
-                <div class="card">
-                    <div class="card-body">
-                        <i class="bi bi-people card-icon"></i> Deleted Clients
-                        <div class="card-number"></div>
-                    </div>
-                </div>
-            </a>
-        </div>
-        <!-- Card 4 -->
-        <div class="col-md-3 col-sm-6">
-            <a class="nav-link text-dark" asp-area="" asp-controller="FollowedClients" asp-action="Index">
-                <div class="card">
-                    <div class="card-body">
-                        <i class="bi bi-arrow-repeat card-icon"></i> Forwards
-                        <div class="card-number"></div>
-                    </div>
-                </div>
-            </a>
+
+                    <button type="submit" class="btn btn-primary mt-1">Leave</button>
+                </form>
+            }
         </div>
     </div>
+    <div class="col-md-2 col-sm-0"></div>
+
 </div>
+<table class="text-center table table-bordered table-hover table-responsive">
+    <thead class=" bg-black text-white">
+        <tr>
+            <th scope="col">Date</th>
+            <th scope="col">Check in</th>
+            <th scope="col">Check out</th>
+            <th scope="col">Late</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var task in Model)
+        {
+            <tr>
+                <td>@task.Date.Day - @task.Date.Month - @task.Date.Year </td>
+                <td>@task.CheckIn.Hours : @task.CheckIn.Minutes</td>
+                <td>@task.CheckOut.Hours : @task.CheckOut.Minutes</td>
+                <td>
+                    @{
+                        var egyptTime = new TimeSpan(9,0,0);
+                        var lat = @task.CheckIn - @egyptTime ;
+                    }
+                    @lat.Hours : @lat.Minutes : @lat.Seconds
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
