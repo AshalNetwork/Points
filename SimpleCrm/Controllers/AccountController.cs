@@ -41,23 +41,23 @@ namespace SimpleCrm.Controllers
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    var attendance = (await unitOfWork.Repository<Attendance>().GetBYPropAsync(new GetUserAttendanceSpec(model.Email, DateTime.Now)));
-                    var user = await _unitOfWork.Repository<ApplicationUser>().GetBYPropAsync(new GetUserByEmail(model.Email));
-                    if (attendance is null)
-                    {
-                        var egyptTimeZoneId = "Egypt Standard Time";
-                        var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById(egyptTimeZoneId);
-                        var egyptTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
-                        await unitOfWork.Repository<Attendance>().
-                        Add(new Attendance
-                        {   
-                            Date = DateTime.Now.Date,
-                            ApplicationUserId = user.Id,
-                            CheckIn = egyptTime.TimeOfDay,
-                        });
-                    }
+                    //var attendance = (await unitOfWork.Repository<Attendance>().GetBYPropAsync(new GetUserAttendanceSpec(model.Email, DateTime.Now)));
+                    //var user = await _unitOfWork.Repository<ApplicationUser>().GetBYPropAsync(new GetUserByEmail(model.Email));
+                    //if (attendance is null)
+                    //{
+                    //    var egyptTimeZoneId = "Egypt Standard Time";
+                    //    var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById(egyptTimeZoneId);
+                    //    var egyptTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
+                    //    await unitOfWork.Repository<Attendance>().
+                    //    Add(new Attendance
+                    //    {   
+                    //        Date = DateTime.Now.Date,
+                    //        ApplicationUserId = user.Id,
+                    //        CheckIn = egyptTime.TimeOfDay,
+                    //    });
+                    //}
                   
-                    await unitOfWork.Complete();
+                    //await unitOfWork.Complete();
                     if (string.IsNullOrEmpty(returnUrl) || !Url.IsLocalUrl(returnUrl))
                     {
                         if (!User.IsInRole(RolesEnum.Employee.ToString()))
