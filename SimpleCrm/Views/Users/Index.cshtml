@@ -39,10 +39,10 @@
                        
                         @if (user.Role != "ProductionMangerA")
                         {
-                            <button onclick="deleteClient('@user.Id')" class="btn btn-outline-danger" type="button"><i class="bi bi-trash"></i> Delete</button>
-                            <a href="\UserPoints\GetUserPointsInDay?UserId=@user.Id" class="btn btn-outline-primary" type="button"><i class="bi bi-star-half"></i> Points</a>
-                            <a href="\Reports\Index?UserId=@user.Id" class="btn btn-outline-success" type="button"><i class="bi bi-chat-left-dots-fill"></i> Reports</a>
-                            <a href="\Penalities\UserPenalities?EmployeeId=@user.Id" class="btn btn-outline-success" type="button"><i class="bi bi-bug"></i> Penalities</a>
+                            <button onclick="deleteUser('@user.Id')" class="btn btn-outline-danger" type="button"><i class="bi bi-trash"></i></button>
+                            <a href="\UserPoints\GetUserPointsInDay?UserId=@user.Id" class="btn btn-outline-primary" type="button"><i class="bi bi-star-half"></i></a>
+                            <a href="\Reports\Index?UserId=@user.Id" class="btn btn-outline-success" type="button"><i class="bi bi-chat-left-dots-fill"></i></a>
+                            <a href="\Penalities\UserPenalities?EmployeeId=@user.Id" class="btn btn-outline-info" type="button"><i class="bi bi-bug"></i></a>
                         }
                     </td>
                     
@@ -55,57 +55,3 @@
   
 </div>
 
- @section Scripts{
- <script>
-     function deleteClient(clientId)
-     { 
-            // Show confirmation dialog
-            $.confirm({
-                title: 'Confirm Delete',
-                content: 'By deleting this user, their clients will be deleted as well. Are you sure you want to delete?',
-                buttons: {
-                    confirm: {
-                        text: 'Confirm',
-                        btnClass: 'btn-danger',
-                        action: function () {
-                            // AJAX request
-                            $.ajax({
-                                url: '/Account/DeleteAccount?UserId=' + clientId,
-                                type: 'post',
-                                success: function (response) {
-
-                                    refreshClientTable(); // Optionally, reload the page
-                                    toastr.success('Account deleted successfully!', 'Success', { timeOut: 5000 })
-
-                                },
-                                error: function (xhr, status, error) {
-                                    console.log("Error:", error);  // Log the error for debugging
-                                    toastr.error('An error occurred while deleting the account.', 'Error!')
-                                }
-                            });
-                        }
-                    },
-                    cancel: function () {
-                        
-                    }
-                }
-            });
-    };
-
-        function refreshClientTable() {
-            $.ajax({
-                url: '@Url.Action("Index", "Users")',
-                type: 'GET',
-                //data: { /* you can send additional data here if needed */ },
-                success: function (result) {
-                    $('table tbody').html($(result).find('table tbody').html());
-                },
-                error: function (xhr, status, error) {
-                    console.error("Failed to refresh the client table: ", error);
-                    alert("An error occurred while refreshing the table.");
-                }
-            });
-        }
-
-</script> 
-}

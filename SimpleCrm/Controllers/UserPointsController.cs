@@ -29,9 +29,10 @@ namespace SimpleCrm.Controllers
             }
 
             var today = DateTime.Today;
-            var startOfWeek = today.AddDays(-(int)today.DayOfWeek + (int)DayOfWeek.Saturday); // Start from Saturday
-            var endOfWeek = startOfWeek.AddDays(6); // End at Thursday (inclusive)
+            
+            var startOfWeek = today.AddDays(-(int)(today.DayOfWeek == DayOfWeek.Saturday ? 0 : today.DayOfWeek + 1));
 
+            var endOfWeek = startOfWeek.AddDays(6);
             var points = await _unitOfWork.Repository<UserPoint>().GetAllWithSpecAsync(new GetUserPointsForAdminSpec(UserId, startOfWeek, endOfWeek));
             var DetailedPoints = points.GroupBy(p => p.DateTime.Date)
                 .Select(g => new DetailedPointVM
@@ -43,8 +44,6 @@ namespace SimpleCrm.Controllers
                     Date = g.FirstOrDefault()!.DateTime.ToString("dddd ,yyyy-MM-dd", CultureInfo.InvariantCulture).ToUpper()
                 }).ToList();
 
-
-            ViewBag.WeeklySummation = DetailedPoints.Sum(p => p.Production + p.Behavior + p.Lateness +p.Preject);
             return View(DetailedPoints);
         }
 

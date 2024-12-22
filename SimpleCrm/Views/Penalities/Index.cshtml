@@ -54,54 +54,9 @@
 
 @section Scripts {
     <script>
-        function deletePenality(penalityId) {
-            // Show confirmation dialog
-            $.confirm({
-                title: 'Confirm Delete',
-                content: 'Are you sure you want to delete?',
-                buttons: {
-                    confirm: {
-                        text: 'Confirm',
-                        btnClass: 'btn-danger',
-                        action: function () {
-                            // AJAX request
-                            $.ajax({
-                                url: '/Penalities/Delete?Id=' + penalityId,
-                                type: 'post',
-                                success: function (response) {
+        
 
-                                    refreshClientTable(); // Optionally, reload the page
-                                    toastr.success('Penality deleted successfully!', 'Success', { timeOut: 5000 })
-
-                                },
-                                error: function (xhr, status, error) {
-                                    console.log("Error:", error);  // Log the error for debugging
-                                    toastr.error('An error occurred while deleting the Task.', 'Error!')
-                                }
-                            });
-                        }
-                    },
-                    cancel: function () {
-
-                    }
-                }
-            });
-        };
-
-        function refreshClientTable() {
-            $.ajax({
-                url: '@Url.Action("Index", "Penalities")',
-                type: 'GET',
-                //data: { /* you can send additional data here if needed */ },
-                success: function (result) {
-                    $('table tbody').html($(result).find('table tbody').html());
-                },
-                error: function (xhr, status, error) {
-                    console.error("Failed to refresh the client table: ", error);
-                    alert("An error occurred while refreshing the table.");
-                }
-            });
-        }
+       
     </script>
 
 }

@@ -46,6 +46,22 @@ namespace SimpleCrm.Controllers
             }).ToList();
             return View(mappedTasks);
         }
+
+        public async Task<IActionResult> GetUserTasksForAdmins(string UserId)
+        {
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            var Tasks = await _unitOfWork.Repository<Tasks>().GetAllWithSpecAsync(new GetMyDayTasksSpec(userId));
+            var mappedTasks = Tasks.Select(z => new GetMyDailyTasksVM
+            {
+                Id = z.Id,
+                Title = z.Title,
+                Description = z.Description ??string.Empty,
+                Status = z.Status.ToString(),
+                StartDate = z.StartAt.ToString("yyyy-MM-dd",CultureInfo.InvariantCulture).ToUpper(),
+                EndDate = z.EndAt.ToString("yyyy-MM-dd",CultureInfo.InvariantCulture).ToUpper(),
+            }).ToList();
+            return View(mappedTasks);
+        }
         public IActionResult Create()
         {
             var model = new CreateTaskVM
