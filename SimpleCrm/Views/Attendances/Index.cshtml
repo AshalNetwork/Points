@@ -1,0 +1,25 @@
+﻿@model List<ApplicationUser>
+<select>
+    @foreach(var user in Model) {
+        <option value="@user.Id">@user.Name</option>
+    }
+</select>
+<button id="checkIn">Action</button>
+@* <button id="checkOut">Check Out</button> *@
+<script>
+    document.getElementById("checkIn").addEventListener('click', () => {
+        document.querySelector('button').textContent='@(ViewBag.Attendance == new TimeSpan() ? "حضور" : "غياب")'
+        let select=document.querySelector('select')
+        let formDate=new FormData()
+        formDate.append("userId",select.value)
+        fetch('/Attendances/Index',{
+            body:formDate,
+            method:"post",
+        }).
+        then((e)=>console.log(e.text())).
+        then((e)=>console.log(e)).
+        catch(e=>{console.log(e)})
+      
+        
+    })
+</script>

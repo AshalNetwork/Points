@@ -9,6 +9,7 @@ namespace SimpleCrm.IRepository
 
         Task<IReadOnlyList<T>> GetAllAsync();
         Task<T> GetBYIdAsync(Guid id);
+        Task<T> GetBYPropAsync(ISpecification<T> spec);
 
         Task<IReadOnlyList<T>> GetAllWithSpecAsync(ISpecification<T> spec);
         Task<T> GetEntityWithSpecAsync(ISpecification<T> spec);

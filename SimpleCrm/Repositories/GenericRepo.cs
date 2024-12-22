@@ -60,5 +60,9 @@ namespace SimpleCrm.Repositories
 
         public void DeleteRange(List<T> entity)
             => _context.Set<T>().RemoveRange(entity);
+
+        public async Task<T> GetBYPropAsync(ISpecification<T> spec) =>
+           await ApplySpecification(spec).FirstOrDefaultAsync();
+
     }
 }
