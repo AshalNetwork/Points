@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SimpleCrm.IRepository;
 using SimpleCrm.Models;
+using SimpleCrm.Specification;
 using System.Diagnostics;
+using System.Security.Claims;
 
 namespace SimpleCrm.Controllers
 {
@@ -13,21 +15,13 @@ namespace SimpleCrm.Controllers
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
 
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-
-            return View();
+            var user = await _userManager.FindByIdAsync(User.Claims.FirstOrDefault(e=>e.Type==ClaimTypes.NameIdentifier)!.Value);
+            var attendances = await _unitOfWork.Repository<Attendance>().
+                GetAllWithSpecAsync(new GetMonthlyAttendances(user.Id));
+            return View(attendances);
         }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
     }
 }
