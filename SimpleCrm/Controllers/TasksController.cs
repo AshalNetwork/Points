@@ -45,7 +45,7 @@ namespace SimpleCrm.Controllers
                 StartDate = z.StartAt.ToString("yyyy-MM-dd",CultureInfo.InvariantCulture).ToUpper(),
                 EndDate = z.EndAt.ToString("yyyy-MM-dd",CultureInfo.InvariantCulture).ToUpper(),
             }).ToList();
-            return Json(mappedTasks);
+            return View(mappedTasks);
         }
 
         [HttpGet]
