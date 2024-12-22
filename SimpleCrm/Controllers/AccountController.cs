@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -40,7 +41,23 @@ namespace SimpleCrm.Controllers
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    
+                    var attendance = (await unitOfWork.Repository<Attendance>().GetBYPropAsync(new GetUserAttendanceSpec(model.Email, DateTime.Now)));
+                    var user = await _unitOfWork.Repository<ApplicationUser>().GetBYPropAsync(new GetUserByEmail(model.Email));
+                    if (attendance is null)
+                    {
+                        var egyptTimeZoneId = "Egypt Standard Time";
+                        var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById(egyptTimeZoneId);
+                        var egyptTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
+                        await unitOfWork.Repository<Attendance>().
+                        Add(new Attendance
+                        {   
+                            Date = DateTime.Now.Date,
+                            ApplicationUserId = user.Id,
+                            CheckIn = egyptTime.TimeOfDay,
+                        });
+                    }
+                  
+                    await unitOfWork.Complete();
                     if (string.IsNullOrEmpty(returnUrl) || !Url.IsLocalUrl(returnUrl))
                     {
                         if (!User.IsInRole(RolesEnum.Employee.ToString()))
@@ -51,25 +68,17 @@ namespace SimpleCrm.Controllers
                         {
                             return RedirectToAction("UserTasks", "Tasks");
                         }
-
                     }
-                    
-                    return Redirect(returnUrl);
-                    
+                    return Redirect(returnUrl);    
                 }
-                
                 else
                 {
-
                     ModelState.AddModelError(string.Empty, "InCorrect Email Or Password");
                 }
             }
-
-            // If we got this far, something failed, redisplay form
             return View(model);
         }
 
-        // POST: /Account/Logout
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
@@ -83,7 +92,6 @@ namespace SimpleCrm.Controllers
             return View();
         }
 
-        // Handle the Forgot Password form submission
         [HttpPost]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
         {
@@ -211,6 +219,20 @@ namespace SimpleCrm.Controllers
                 ModelState.AddModelError(string.Empty, result.Errors.ToString());
             return RedirectToAction("Index", "Users");
 
+        }
+        [HttpPost]
+        public async Task Checkout()
+        {
+            var user = await _userManager.FindByIdAsync( User.Claims.FirstOrDefault()!.Value);
+            if (user != null)
+            {
+                var egyptTimeZoneId = "Egypt Standard Time";
+                var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById(egyptTimeZoneId);
+                var egyptTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
+                var attendance=await _unitOfWork.Repository<Attendance>().GetBYPropAsync(new GetUserAttendanceSpec(user.Email, egyptTime.Date));
+                attendance.CheckOut = egyptTime.TimeOfDay;
+                await _unitOfWork.Complete();
+            }
         }
     }
 }

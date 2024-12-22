@@ -13,7 +13,7 @@ namespace SimpleCrm.Controllers
         public async Task<IActionResult> Index()
         {
             
-            return View(await unitOfWork.Repository<ApplicationUser>().GetAllAsync());
+            return View(await unitOfWork.Repository<Attendance>().GetAllWithSpecAsync( new GetAttendanceSpec()));
         }
 
         [HttpPost]

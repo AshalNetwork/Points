@@ -4,9 +4,10 @@ namespace SimpleCrm.Specification
 {
     public class GetUserAttendanceSpec:BaseSpecification<Attendance>
     {
-        public GetUserAttendanceSpec(string userId, DateTime date)
+        public GetUserAttendanceSpec(string email, DateTime date)
         {
-            Criteria = e=>e.ApplicationUserId==userId && e.Date.Date==date.Date;
+            Includes.Add(e => e.ApplicationUser);
+            Criteria = e=>e.ApplicationUser.Email == email && e.Date.Date==date.Date;
         }
     }
 }
