@@ -66,7 +66,7 @@ namespace SimpleCrm.Controllers
                         }
                         else
                         {
-                            return RedirectToAction("UserTasks", "Tasks");
+                            return RedirectToAction("Index", "Home");
                         }
                     }
                     return Redirect(returnUrl);    

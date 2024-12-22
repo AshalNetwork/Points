@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -47,20 +48,20 @@ namespace SimpleCrm.Controllers
             return View(mappedTasks);
         }
 
-        public async Task<IActionResult> GetUserTasksForAdmins(string UserId)
+        [HttpGet]
+        public async Task<IActionResult> GetUserTasksForAdmins(string UserId, StatusEnums Status = StatusEnums.UnderReview)
         {
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            var Tasks = await _unitOfWork.Repository<Tasks>().GetAllWithSpecAsync(new GetMyDayTasksSpec(userId));
+            var Tasks = await _unitOfWork.Repository<Tasks>().GetAllWithSpecAsync(new GetUserTasksForAdminSpec(UserId, Status));
             var mappedTasks = Tasks.Select(z => new GetMyDailyTasksVM
             {
                 Id = z.Id,
                 Title = z.Title,
-                Description = z.Description ??string.Empty,
+                Description = z.Description ?? string.Empty,
                 Status = z.Status.ToString(),
-                StartDate = z.StartAt.ToString("yyyy-MM-dd",CultureInfo.InvariantCulture).ToUpper(),
-                EndDate = z.EndAt.ToString("yyyy-MM-dd",CultureInfo.InvariantCulture).ToUpper(),
+                StartDate = z.StartAt.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture).ToUpper(),
+                EndDate = z.EndAt.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture).ToUpper(),
             }).ToList();
-            return View(mappedTasks);
+            return View();
         }
         public IActionResult Create()
         {
@@ -206,6 +207,21 @@ namespace SimpleCrm.Controllers
                 _unitOfWork.Rollback();
                 return RedirectToAction("Index", "Tasks");
             }
+        }
+        [HttpGet("yu")]
+        public async Task<List<GetMyDailyTasksVM>> ss()
+        {
+            var Tasks = await _unitOfWork.Repository<Tasks>().GetAllWithSpecAsync(new GetMyDayTasksSpec("f9b614bb-ab17-4c6b-b895-164bfad060dc"));
+            var mappedTasks = Tasks.Select(z => new GetMyDailyTasksVM
+            {
+                Id = z.Id,
+                Title = z.Title,
+                Description = z.Description ?? string.Empty,
+                Status = z.Status.ToString(),
+                StartDate = z.StartAt.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture).ToUpper(),
+                EndDate = z.EndAt.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture).ToUpper(),
+            }).ToList();
+            return (mappedTasks);
         }
     }
 }

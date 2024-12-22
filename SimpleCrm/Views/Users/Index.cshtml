@@ -12,9 +12,9 @@
             </div>
         </div>
         <div class="col-md-2 col-sm-0"></div>
-
+       
     </div>
-
+  
 
     <table class="table table-bordered table-hover table-responsive">
         <thead class="text-center bg-black text-white">
@@ -34,16 +34,17 @@
                     <td>@user.Email</td>
                     <td>@user.Phone</td>
                     <td>@user.Role</td>
-
+                    
                     <td>
+                       
                         @if (user.Role != "ProductionMangerA")
                         {
-                            <button onclick="deleteUser('@user.Id')" class="btn btn-outline-danger" type="button"><i class="bi bi-trash"></i></button>
+                            <button onclick="deleteUser('@user.Id')" class="btn btn-outline-danger" type="button"><i class="bi bi-trash"></i></button>                            
                         }
                         <a href="\UserPoints\GetUserPointsInDay?UserId=@user.Id" class="btn btn-outline-primary" type="button"><i class="bi bi-star-half"></i></a>
                         <a href="\Reports\Index?UserId=@user.Id" class="btn btn-outline-success" type="button"><i class="bi bi-chat-left-dots-fill"></i></a>
                         <a href="\Penalities\UserPenalities?EmployeeId=@user.Id" class="btn btn-outline-info" type="button"><i class="bi bi-bug"></i></a>
-                        <a href="\Attendances\GetUserAttendance?UserId=@user.Id" class="btn btn-outline-info" type="button"><i class="bi bi-arrow-left-right"></i></a>                        
+                        <a href="\Tasks\GetUserTasksForAdmins?UserId=@user.Id" class="btn btn-outline-info" type="button"><i class="bi bi-list-task"></i></a>
                     </td>
                     
                 </tr>
