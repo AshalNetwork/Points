@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SimpleCrm.Contexts;
 
@@ -11,9 +12,11 @@ using SimpleCrm.Contexts;
 namespace SimpleCrm.Migrations
 {
     [DbContext(typeof(PointsDbContext))]
-    partial class PointsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241221143026_UpdateSalesPart")]
+    partial class UpdateSalesPart
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -247,7 +250,7 @@ namespace SimpleCrm.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("Attendance", (string)null);
+                    b.ToTable("Attendance");
                 });
 
             modelBuilder.Entity("SimpleCrm.Models.Penality", b =>
@@ -275,7 +278,7 @@ namespace SimpleCrm.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Penalities", (string)null);
+                    b.ToTable("Penalities");
                 });
 
             modelBuilder.Entity("SimpleCrm.Models.PointsValue", b =>
@@ -296,7 +299,7 @@ namespace SimpleCrm.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PointsValues", (string)null);
+                    b.ToTable("PointsValues");
                 });
 
             modelBuilder.Entity("SimpleCrm.Models.Report", b =>
@@ -320,7 +323,7 @@ namespace SimpleCrm.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Reports", (string)null);
+                    b.ToTable("Reports");
                 });
 
             modelBuilder.Entity("SimpleCrm.Models.Sale", b =>
@@ -329,14 +332,14 @@ namespace SimpleCrm.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<bool>("Accepted")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -346,7 +349,7 @@ namespace SimpleCrm.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Sales", (string)null);
+                    b.ToTable("Sales");
                 });
 
             modelBuilder.Entity("SimpleCrm.Models.Tasks", b =>
@@ -379,7 +382,7 @@ namespace SimpleCrm.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Tasks", (string)null);
+                    b.ToTable("Tasks");
                 });
 
             modelBuilder.Entity("SimpleCrm.Models.UserPoint", b =>
@@ -410,7 +413,7 @@ namespace SimpleCrm.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserPoints", (string)null);
+                    b.ToTable("UserPoints");
                 });
 
             modelBuilder.Entity("SimpleCrm.Models.ValidationCode", b =>
@@ -435,7 +438,7 @@ namespace SimpleCrm.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ValidationCodes", (string)null);
+                    b.ToTable("ValidationCodes");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

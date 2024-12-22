@@ -15,6 +15,10 @@ namespace SimpleCrm.Contexts
         public DbSet<PointsValue> PointsValues { get; set; }
         public DbSet<Tasks> Tasks { get; set; }
         public DbSet<Attendance> Attendance { get; set; }
+        public DbSet<UserPoint> UserPoints { get; set; }
+        public DbSet<Penality> Penalities { get; set; }
+        public DbSet<Report> Reports { get; set; }
+        public DbSet<Sale> Sales { get; set; }
         
     }
 }

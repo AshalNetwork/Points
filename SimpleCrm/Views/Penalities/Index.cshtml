@@ -1,29 +1,33 @@
-﻿@model IEnumerable<SimpleCrm.VM.AllTasksVM>
+﻿@using System.Security.Claims
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
 @{
-    ViewData["Title"] = "Tasks";
+    var userRole = Context.User.FindFirst(ClaimTypes.Role)?.Value;
+}
+
+@model IEnumerable<SimpleCrm.VM.UserPenalitiesVM>
+@{
+    ViewData["Title"] = "Penalities";
 }
 <div>
-    <h1 class="text-center">All Tasks</h1>
+    <h1 class="text-center">All Penalities</h1>
+
     <div class="row mb-2">
         <div class="col-md-6 col-sm-12">
             <div class="btn-group">
-                <a class="btn btn-success" aria-current="page" asp-action="Create"><i class="bi bi-plus"></i>Create New Task</a>
+                <a class="btn btn-success" aria-current="page" asp-action="Create"><i class="bi bi-plus"></i>Create New Penality</a>
             </div>
         </div>
         <div class="col-md-2 col-sm-0"></div>
 
     </div>
-
-
     <table class="table table-bordered table-hover table-responsive">
         <thead class="text-center bg-black text-white">
             <tr>
-                <th scope="col">Title</th>
-                <th scope="col">Description</th>
-                <th scope="col">Status</th>
-                <th scope="col">User</th>
-                <th scope="col">Start Date</th>
-                <th scope="col">End Date</th>
+                <th scope="col">User</th>                    
+                <th scope="col">Description</th>                    
+                <th scope="col">Reason</th>                    
+                <th scope="col">Date</th>
                 <th scope="col">Action</th>
             </tr>
         </thead>
@@ -31,28 +35,18 @@
             @foreach (var task in Model)
             {
                 <tr>
-                    <td>@task.Title</td>
-                    <td>@task.Description</td>
-                    <td>@task.Status.ToString()</td>
                     <td>@task.User</td>
-                    <td>@task.StartDate</td>
-                    <td>@task.EndDate</td>
-
+                    <td>@task.Description</td>
+                    <td>@task.Reason</td>
+                    <td>@task.Date</td>
                     <td>
-                        @if (task.Role == "Employee")
+                        @if (userRole != "Employee")
                         {
-                            <button onclick="deleteTask('@task.Id')" class="btn btn-outline-danger" type="button"><i class="bi bi-trash"></i> Delete</button>
-                        }
-                        @if (task.Status == "UnderReview")
-                        {
-                            <button onclick="CompleteTask('@task.Id')" class="btn btn-outline-success" type="button"><i class="bi bi-check-circle"></i> Complete</button>
+                            <button onclick="deletePenality('@task.Id')" class="btn btn-outline-danger" type="button"><i class="bi bi-trash"></i> Delete</button>
                         }
                     </td>
-
                 </tr>
             }
-
-
         </tbody>
     </table>
 
@@ -60,7 +54,7 @@
 
 @section Scripts {
     <script>
-        function deleteTask(taskId) {
+        function deletePenality(penalityId) {
             // Show confirmation dialog
             $.confirm({
                 title: 'Confirm Delete',
@@ -72,12 +66,12 @@
                         action: function () {
                             // AJAX request
                             $.ajax({
-                                url: '/Tasks/Delete?Id=' + taskId,
+                                url: '/Penalities/Delete?Id=' + penalityId,
                                 type: 'post',
                                 success: function (response) {
 
                                     refreshClientTable(); // Optionally, reload the page
-                                    toastr.success('Task deleted successfully!', 'Success', { timeOut: 5000 })
+                                    toastr.success('Penality deleted successfully!', 'Success', { timeOut: 5000 })
 
                                 },
                                 error: function (xhr, status, error) {
@@ -93,22 +87,10 @@
                 }
             });
         };
-        function CompleteTask(taskId) {
-            $.ajax({
-                url: '/Tasks/CompleteTask?TaskId=' + taskId,
-                type: 'PUT',
-                success: function () {
-                    refreshClientTable();
-                    toastr.success('Task has been marked as Completed.', 'Success');
-                },
-                error: function () {
-                    toastr.error('Failed to update task. Please try again.', 'Error');
-                }
-            });
-        }
+
         function refreshClientTable() {
             $.ajax({
-                url: '@Url.Action("Index", "Tasks")',
+                url: '@Url.Action("Index", "Penalities")',
                 type: 'GET',
                 //data: { /* you can send additional data here if needed */ },
                 success: function (result) {
@@ -120,6 +102,6 @@
                 }
             });
         }
-
     </script>
+
 }

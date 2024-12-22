@@ -1,0 +1,33 @@
+﻿@model IEnumerable<SimpleCrm.VM.AllSalesRequestsVM>
+@{
+    ViewData["Title"] = "My Sales";
+}
+<div>
+    <h1 class="text-center">My Sales</h1>
+
+ 
+
+    <table class="table table-bordered table-hover table-responsive text-center">
+        <thead class="text-center bg-black text-white">
+            <tr>
+                <th scope="col">Description</th>
+                <th scope="col">Status</th>
+                <th scope="col">Date</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var task in Model)
+            {
+                <tr class="client-row">
+                    <td>@task.Description</td>
+                    <td>@task.Status</td>
+                    <td>@task.Date</td>
+                    <td>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>

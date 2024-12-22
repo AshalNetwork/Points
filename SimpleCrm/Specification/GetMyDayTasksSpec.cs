@@ -1,4 +1,5 @@
-﻿using SimpleCrm.Models;
+﻿using SimpleCrm.Enums;
+using SimpleCrm.Models;
 
 namespace SimpleCrm.Specification
 {
@@ -6,7 +7,8 @@ namespace SimpleCrm.Specification
     {
         public GetMyDayTasksSpec(string UserId):base(z=>z.UserId==UserId)
         {
-            Criteria = z=>z.StartAt.Date == DateTime.Now.Date;
+            Criteria = z => z.StartAt.Date == DateTime.Now.Date&&( z.Status == StatusEnums.Pending || z.Status == StatusEnums.InProgress);
+            OrderBy = z => z.EndAt.Date;
         }
     }
 }

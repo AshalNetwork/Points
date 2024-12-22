@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SimpleCrm.Enums;
@@ -11,6 +12,7 @@ using System.Security.Claims;
 
 namespace SimpleCrm.Controllers
 {
+    [Authorize]
     public class TasksController(IUnitOfWork _unitOfWork,UserManager<ApplicationUser> _userManager) : Controller
     {
         public async Task<IActionResult> Index()
@@ -94,6 +96,100 @@ namespace SimpleCrm.Controllers
                 }
             }
             return View(model);
+        }
+        [HttpPut]       
+        public async Task<IActionResult> UnderReview(string TaskId)
+        {
+
+             var task = await _unitOfWork.Repository<Tasks>().GetBYIdAsync(Guid.Parse(TaskId));
+            try
+            {
+                task.Status = StatusEnums.UnderReview;
+                _unitOfWork.Repository<Tasks>().Update(task);
+                await _unitOfWork.Complete();
+                return RedirectToAction("UserTasks", "Tasks");
+            }
+            catch (Exception ex)
+            {
+                _unitOfWork.Rollback();
+
+                return RedirectToAction("UserTasks", "Tasks");
+            }
+
+        }
+        [HttpPut]       
+        public async Task<IActionResult> InProgress(string TaskId)
+        {
+
+             var task = await _unitOfWork.Repository<Tasks>().GetBYIdAsync(Guid.Parse(TaskId));
+            try
+            {
+                task.Status = StatusEnums.InProgress;
+                _unitOfWork.Repository<Tasks>().Update(task);
+                await _unitOfWork.Complete();
+                return RedirectToAction("UserTasks", "Tasks");
+            }
+            catch (Exception ex)
+            {
+                _unitOfWork.Rollback();
+
+                return RedirectToAction("UserTasks", "Tasks");
+            }
+
+        }
+        [HttpPut]       
+        public async Task<IActionResult> CompleteTask(string TaskId)
+        {
+
+             var task = await _unitOfWork.Repository<Tasks>().GetBYIdAsync(Guid.Parse(TaskId));
+            var UserTasks = await _unitOfWork.Repository<Tasks>().GetCountWithSpecAsync(new BaseSpecification<Tasks>(z=>z.UserId==task.UserId&&z.StartAt.Date==DateTime.Now.Date));
+            var Taskpoint = 170.0m / UserTasks;
+            try
+            {
+                task.Status = StatusEnums.Completed;
+                _unitOfWork.Repository<Tasks>().Update(task);
+                var userPoint = new UserPoint
+                {
+                    DateTime = DateTime.Now,
+                    UserId = task.UserId,
+                    TaskId = task.Id,
+                    value = Taskpoint,
+                    PointType = PointsTypeEnum.Production,
+                };
+                await _unitOfWork.Repository<UserPoint>().Add(userPoint);
+
+                await _unitOfWork.Complete();
+                return RedirectToAction("UserTasks", "Tasks");
+            }
+            catch (Exception ex)
+            {
+                _unitOfWork.Rollback();
+
+                return RedirectToAction("UserTasks", "Tasks");
+            }
+
+        }
+        [HttpPost]
+        public async Task<ActionResult> Delete(string Id)
+        {
+            var task = await _unitOfWork.Repository<Tasks>().GetBYIdAsync(Guid.Parse(Id));
+            if (task == null)
+            {
+                return View();
+            }
+            try
+            {
+                var userpoints = await _unitOfWork.Repository<UserPoint>().GetAllWithSpecAsync(new BaseSpecification<UserPoint>(z=>z.TaskId==Guid.Parse(Id)));
+                _unitOfWork.Repository<UserPoint>().DeleteRange(userpoints.ToList());
+                _unitOfWork.Repository<Tasks>().Delete(task);
+                await _unitOfWork.Complete();
+                return RedirectToAction("Index", "Tasks");
+            }
+            catch (Exception ex)
+            {
+                _unitOfWork.Rollback();
+                return RedirectToAction("Index", "Tasks");
+            }
         }
     }
 }

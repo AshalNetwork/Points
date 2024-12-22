@@ -4,16 +4,16 @@
 }
 <h1 class="text-center mt-5">My Tasks</h1>
 <div class="row">
-    
 @foreach (var item in Model)
 {
-      <div class="col-sm-12 col-md-3">
+      <div class="col-sm-12 col-md-3 mb-2">
         <div class="card" style="width: 18rem;">
             <div class="card-body">
                 <p class="d-none">@item.Id</p>
                 <h5 class="card-title text-center"> @item.Title</h5>
                 <p class="card-text">@item.Description</p>
                 <p class="card-text">DeadLine: @item.EndDate
+
                     @if (item.Status == "Pending")
                     {
                         <span class="text-info"> @item.Status</span>
@@ -24,10 +24,58 @@
                     }
 
                 </p>
-                <a href="#" class="card-link">Completed</a>
-                <a href="#" class="card-link">InProgress</a>
-            </div>
+                    <button onclick="UnderReview('@item.Id')" class="btn btn-success" type="button"><i class="bi bi-check-circle"></i> Completed</button>
+                    @if (item.Status != "InProgress")
+                    {
+                        <button onclick="InProgressTask('@item.Id')" class="btn btn-primary" type="button"><i class="bi bi-gear"></i> InProgress</button>
+                    }
+                </div>
         </div>
       </div>
 }
+@section Scripts{
+ <script>
+    function UnderReview(taskId) {
+        $.ajax({
+            url: '/Tasks/UnderReview?TaskId=' +taskId,
+            type: 'PUT',
+            success: function () {
+                refreshClientTable();
+                toastr.success('Task has been marked as Under Review.', 'Success');
+            },
+            error: function () {
+                toastr.error('Failed to update task. Please try again.', 'Error');
+            }
+        });
+    }
+    function InProgressTask(taskId) {
+        $.ajax({
+            url: '/Tasks/InProgress?TaskId=' + taskId,
+            type: 'PUT',
+            success: function () {
+                refreshClientTable();
+                toastr.success('Task has been marked as InProgress.', 'Success');
+            },
+            error: function () {
+                toastr.error('Failed to update task. Please try again.', 'Error');
+            }
+        });
+    }
+    function refreshClientTable() {
+        $.ajax({
+            url: '@Url.Action("UserTasks", "Tasks")',
+            type: 'GET',
+            //data: { /* you can send additional data here if needed */ },
+            success: function (result) {
+                $('.row').html($(result).find('.row').html());
+            },
+            error: function (xhr, status, error) {
+                console.error("Failed to refresh Your Tasks ", error);
+                alert("An error occurred while refreshing the table.");
+            }
+        });
+    }
+</script> 
+}
+
 </div>

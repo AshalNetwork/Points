@@ -1,0 +1,76 @@
+﻿@model IEnumerable<SimpleCrm.VM.UserReportsVM>
+@{
+    ViewData["Title"] = "Reports";
+}
+<div>
+    <h1 class="text-center">All Reports</h1>
+
+
+    <table class="table table-bordered table-hover table-responsive">
+        <thead class="text-center bg-black text-white">
+            <tr>
+
+                <th scope="col">Description</th>
+                <th scope="col">Date</th>
+                <th scope="col">View</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var task in Model)
+            {
+                <tr>
+                    <td>@if (@task.Description.Length > 150)
+                        {
+                            @task.Description.Substring(0, 150) 
+                        }else{
+                         @task.Description
+                        }
+                    </td>
+                    <td>@task.Date</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm"
+                                data-bs-toggle="modal"
+                                data-bs-target="#descriptionModal"
+                                data-id="@task.Id"
+                                data-description="@task.Description">
+                            View Full
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>
+
+
+<div class="modal fade" id="descriptionModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLabel">Full Description</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="fullDescription" style="word-wrap:anywhere"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const descriptionModal = document.getElementById('descriptionModal');
+        descriptionModal.addEventListener('show.bs.modal', event => {
+            const button = event.relatedTarget; // Button that triggered the modal
+            const description = button.getAttribute('data-description');
+
+            // Set the content in the modal
+            const modalBody = descriptionModal.querySelector('#fullDescription');
+            modalBody.textContent = description;
+        });
+    });
+</script>

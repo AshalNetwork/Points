@@ -1,0 +1,226 @@
+﻿@using System.Security.Claims
+@using Microsoft.AspNetCore.Identity
+
+@model IEnumerable<SimpleCrm.VM.AllSalesRequestsVM>
+@{
+    ViewData["Title"] = "All Sales";
+}
+<div>
+    <h1 class="text-center">All Sales</h1>
+
+    <div class="row">
+        @if (User.Identity.IsAuthenticated)
+        {
+            @if (!User.IsInRole("ProductionMangerA"))
+            {
+                <div class="col-md-6 col-sm-12">
+                    <button type="button" class="btn btn-success" aria-current="page"
+                            data-bs-toggle="modal"
+                            data-bs-target="#exampleModal">
+                        <i class="bi bi-plus"></i> Add Sales Request
+                    </button>
+                </div>
+            }
+
+        }
+
+
+        <div class="col-md-6 col-sm-12 weekPoints">
+        </div>
+
+    </div>
+
+    <table class="table table-bordered table-hover table-responsive text-center">
+        <thead class="text-center bg-black text-white">
+            <tr>
+                <th scope="col">User</th>
+                <th scope="col">Description</th>
+                <th scope="col">Status</th>
+                <th scope="col">Date</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var task in Model)
+            {
+                <tr class="client-row">
+                    <td>@task.User</td>
+                    <td>@task.Description</td>
+                    <td>@task.Status</td>
+                    <td>@task.Date</td>
+                    <td>                        
+                        @if(task.Status=="Pending")
+                        {
+                            <button onclick="AcceptSalesRequest('@task.Id')" class="btn btn-outline-success" type="button"><i class="bi bi-trash"></i> Accept</button>                        
+                            <button onclick="RejectSalesRequest('@task.Id')" class="btn btn-outline-danger" type="button"><i class="bi bi-trash"></i> Reject</button>                        
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>
+
+
+<!-- PoP Up-->
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5 text-center" id="exampleModalLabel">Add Project Sale Request</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="authorizationForm" method="post" autocomplete="off">
+                    @Html.AntiForgeryToken()
+                  @*   <div class="form-group">
+                        <label class="control-label">User ID</label>
+                        <input type="text" name="UserId" id="userIdInput" class="form-control" readonly />
+                    </div> *@
+                    <div class="form-group">
+                        <label class="control-label">Description</label>
+                        <input name="Description" class="form-control" placeholder="Enter the Description" data-val="true" data-val-required="Enter The Type Is RequiredDescription"/>
+                        <span class="text-danger" data-valmsg-for="Description" data-valmsg-replace="true"></span>
+                    </div>
+
+                    <div class="form-group m-1">
+                        <input type="submit" value="Save" class="btn btn-primary" />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function AcceptSalesRequest(requestId) {
+            // Show confirmation dialog
+            $.confirm({
+                title: 'confirm Request',
+                content: 'Are you sure you want Accept This Request?',
+                buttons: {
+                    confirm: {
+                        text: 'Confirm',
+                        btnClass: 'btn-success',
+                        action: function () {
+                            // AJAX request
+                            $.ajax({
+                                url: '/Sales/Accept?Id=' + requestId,
+                                type: 'post',
+                                success: function (response) {
+
+                                    refreshTransactionsTable(); // Optionally, reload the page
+                                    toastr.success('The Request Has Accepted successfully!', 'Success', { timeOut: 5000 })
+
+                                },
+                                error: function (xhr, status, error) {
+                                    console.log("Error:", error);  // Log the error for debugging
+                                    toastr.error('An error occurred while Accept The Request', 'Error!')
+                                }
+                            });
+                        }
+                    },
+                    cancel: function () {
+
+                    }
+                }
+            });
+        }; function RejectSalesRequest(requestId) {
+            // Show confirmation dialog
+            $.confirm({
+                title: 'confirm Request',
+                content: 'Are you sure you want Reject This Request?',
+                buttons: {
+                    confirm: {
+                        text: 'Confirm',
+                        btnClass: 'btn-danger',
+                        action: function () {
+                            // AJAX request
+                            $.ajax({
+                                url: '/Sales/Reject?Id=' + requestId,
+                                type: 'post',
+                                success: function (response) {
+
+                                    refreshTransactionsTable(); // Optionally, reload the page
+                                    toastr.success('The Request Has Rejected successfully!', 'Success', { timeOut: 5000 })
+
+                                },
+                                error: function (xhr, status, error) {
+                                    console.log("Error:", error);  // Log the error for debugging
+                                    toastr.error('An error occurred while Reject The Request', 'Error!')
+                                }
+                            });
+                        }
+                    },
+                    cancel: function () {
+
+                    }
+                }
+            });
+        };
+        function refreshTransactionsTable() {
+            $.ajax({
+                url: '/Sales/Index',
+                type: 'GET',
+                success: function (result) {
+                    $('table tbody').html($(result).find('table tbody').html());
+                },
+                error: function (xhr, status, error) {
+                    console.error("Failed to refresh the client table: ", error);
+                    alert("An error occurred while refreshing the table.");
+                }
+            });
+        }
+        $(document).ready(function () {
+            // Function to get query parameters from the URL
+          
+            // When the Add Point button is clicked, populate the UserId field in the modal
+            $('#exampleModal').on('show.bs.modal', function () {
+                
+            });
+            $('#authorizationForm').on('submit', function (event) {
+                event.preventDefault();
+                let isValid = true;
+                $(this).find('input, select').each(function () {
+                    if (!this.checkValidity()) {
+                        isValid = false;
+                        $(this).addClass('is-invalid');  // Highlight invalid fields
+                        $(this).next('.text-danger').text(this.validationMessage).show();  // Show custom error message below the input
+                    } else {
+                        $(this).removeClass('is-invalid');
+                        $(this).next('.text-danger').text('').hide();  // Hide error message if valid
+                    }
+                });
+
+                if (!isValid) {
+                    return;  // Stop form submission if validation fails
+                }
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/Sales/Create/',
+                    data: $(this).serialize(),
+                    success: function (response) {
+
+                        $('#exampleModal').modal('hide');
+                        $('#authorizationForm')[0].reset();
+                        toastr.success('Sales Request Has Saved Successfully', { timeOut: 5000 })
+                        refreshTransactionsTable();
+                    },
+                    error: function (xhr, status, error) {
+                        toastr.error('An Error Occured While Saving The Sales Request', { timeOut: 5000 })
+                    }
+                });
+            });
+        
+           
+          
+        });
+    </script>
+}

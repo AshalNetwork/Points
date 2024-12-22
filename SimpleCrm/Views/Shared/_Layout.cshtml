@@ -48,8 +48,15 @@
                                         <a class="nav-link text-dark" asp-area="" asp-controller="Tasks" asp-action="Index">Tasks</a>
                                     </li>
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">Users</a>
-
+                                    <li class="nav-item">
+                                        <a class="nav-link text-dark" asp-area="" asp-controller="Penalities" asp-action="Index">Penalities</a>
+                                    </li> 
+                                    <li class="nav-item">
+                                        <a class="nav-link text-dark" asp-area="" asp-controller="Sales" asp-action="Index">Sales</a>
+                                    </li> 
                                 }
+                               
+                                
                             }
                         </ul>
                         <ul class="navbar-nav">
@@ -64,9 +71,23 @@
                                         <li>
                                             <a class="dropdown-item text-dark" asp-area="" asp-controller="Account" asp-action="ChangePassword"><i class="bi bi-key"></i> Change Password</a>
                                         </li>
-                                        @if (!User.IsInRole("Emplyee "))
+                                        @if (!User.IsInRole("ProductionMangerA"))
                                         {
-                                            <a class="dropdown-item text-dark" asp-area="" asp-action="ExportClientsToExcel" asp-controller="Clients"><i class="bi bi-file-spreadsheet"></i> Export Clients</a>
+                                            <li class="nav-item">
+                                                <a class="nav-link text-dark" asp-area="" asp-controller="Tasks" asp-action="UserTasks">My Tasks</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link text-dark" asp-area="" asp-controller="Reports" asp-action="UserReports">My Reports</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link text-dark" asp-area="" asp-controller="Penalities" asp-action="UserPenalities"> My Penalities</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link text-dark" asp-area="" asp-controller="Sales" asp-action="GetUserSales"> My Sales</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a href="\UserPoints\GetUserPointsInDay?UserId=@userId" class="nav-link text-dark">My Points</a>
+                                            </li>
                                         }
                                         <li>
                                             <form asp-controller="Account" asp-action="Logout" method="post" id="logoutForm" class="form-inline">
@@ -107,3 +128,4 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+}

@@ -1,0 +1,29 @@
+﻿@model SimpleCrm.VM.CreatePenalityDto
+@{
+    ViewData["Title"] = "Create Penality";
+}
+
+<h2 class="text-center">Create Penality</h2>
+<form asp-action="Create" method="post" class="w-75 m-auto">
+    @Html.AntiForgeryToken()
+    <div class="form-group">
+        <label asp-for="Description"></label>
+        <input asp-for="Description" class="form-control" placeholder="Enter The Description" />
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Reason"></label>
+        <input asp-for="Reason" class="form-control" placeholder="Enter The Reason" />
+        <span asp-validation-for="Reason" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="UserId"></label>
+        <select asp-for="UserId" asp-items="Model.UsersList" class="form-control"></select>
+        <span asp-validation-for="UserId" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary mt-1">Create</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

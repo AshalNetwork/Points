@@ -1,0 +1,31 @@
+﻿@model IEnumerable<SimpleCrm.VM.UserPenalitiesVM>
+@{
+    ViewData["Title"] = "My Penalities";
+}
+<div>
+    <h1 class="text-center">My Penalities</h1>
+
+
+    <table class="table table-bordered table-hover table-responsive">
+        <thead class="text-center bg-black text-white">
+            <tr>
+                <th scope="col">Description</th>
+                <th scope="col">Reason</th>
+                <th scope="col">Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var task in Model)
+            {
+                <tr>
+                    <td>@task.Description</td>
+                    <td>@task.Reason</td>
+                    <td>@task.Date</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>
+
+

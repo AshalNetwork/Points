@@ -1,0 +1,19 @@
+﻿@model SimpleCrm.VM.CreateReportDto
+@{
+    ViewData["Title"] = "Create Report";
+}
+
+<h2 class="text-center">Create New Report</h2>
+<form asp-action="Create" method="post" class="w-75 m-auto">
+    @Html.AntiForgeryToken()
+    <div class="form-group">
+        <label asp-for="Description"></label>
+        <textarea asp-for="Description" class="form-control" placeholder="Enter The Description"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary mt-1">Create</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

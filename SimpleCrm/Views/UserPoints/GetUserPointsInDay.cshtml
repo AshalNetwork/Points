@@ -1,0 +1,170 @@
+﻿@using System.Security.Claims
+@using Microsoft.AspNetCore.Identity
+
+@model IEnumerable<SimpleCrm.VM.DetailedPointVM>
+@{
+    ViewData["Title"] = "Points";
+}
+<div>
+    <h1 class="text-center">All User Points</h1>
+
+    <div class="row">
+         @if (User.Identity.IsAuthenticated)
+        {
+            @if (!User.IsInRole("Employee"))
+            {
+                <div class="col-md-6 col-sm-12">
+                    <button type="button" class="btn btn-success" aria-current="page"
+                    data-bs-toggle="modal"
+                    data-bs-target="#exampleModal">
+                        <i class="bi bi-plus"></i> Add Point
+                    </button>
+                </div>
+            }
+
+        }
+        <div class="col-md-6 col-sm-12 weekPoints">
+            <h4>Week Points:@ViewBag.WeeklySummation /1200</h4>             
+        </div>
+        
+    </div>
+
+    <table class="table table-bordered table-hover table-responsive text-center">
+        <thead class="text-center bg-black text-white">
+            <tr>
+                <th scope="col">Production</th>
+                <th scope="col">Behavior</th>
+                <th scope="col">Lateness</th>
+                <th scope="col">Preject</th>
+                <th scope="col">Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var task in Model)
+            {
+                <tr class="client-row">
+                    <td>@task.Production</td>
+                    <td>@task.Behavior</td>
+                    <td>@task.Lateness</td>
+                    <td>@task.Preject</td>
+                    <td>@task.Date</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>
+
+
+<!-- PoP Up-->
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5 text-center" id="exampleModalLabel">Add Point</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="authorizationForm" method="post" autocomplete="off">
+                    @Html.AntiForgeryToken()
+                    <div class="form-group d-none">
+                        <input type="text" name="UserId" id="userIdInput" class="form-control" readonly />
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Point</label>
+                        <input name="Value" class="form-control" placeholder="Enter the point" data-val="true" data-val-required="Then Point Field Is Required" required />
+                        <span class="text-danger" data-valmsg-for="Value" data-valmsg-replace="true"></span>
+                    </div>
+                
+
+                    <div class="form-group">
+                        <label class="control-label">Type</label>
+                        <select name="PointType" id="reasonDropdown" class="form-control" data-val="true" data-val-required="The Type Is Required" required>
+                            <option value="">--Type--</option>
+                            <option value="2">Behavior</option>
+                            <option value="3">Lateness</option>
+                            <option value="4">Custom</option>
+                        </select>
+                        <span class="text-danger" data-valmsg-for="PointType" data-valmsg-replace="true"></span>
+                    </div>
+
+                    <div class="form-group m-1">
+                        <input type="submit" value="Save" class="btn btn-primary" />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Function to get query parameters from the URL
+            function getQueryParam(param) {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get(param);
+            }
+
+            // Retrieve the UserId from the URL
+            const userId = getQueryParam('UserId');
+
+            // When the Add Point button is clicked, populate the UserId field in the modal
+            $('#exampleModal').on('show.bs.modal', function () {
+                $('#userIdInput').val(userId);
+            });
+            $('#authorizationForm').on('submit', function (event) {
+                event.preventDefault();
+                let isValid = true;
+                $(this).find('input, select').each(function () {
+                    if (!this.checkValidity()) {
+                        isValid = false;
+                        $(this).addClass('is-invalid');  // Highlight invalid fields
+                        $(this).next('.text-danger').text(this.validationMessage).show();  // Show custom error message below the input
+                    } else {
+                        $(this).removeClass('is-invalid');
+                        $(this).next('.text-danger').text('').hide();  // Hide error message if valid
+                    }
+                });
+
+                if (!isValid) {
+                    return;  // Stop form submission if validation fails
+                }
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/UserPoints/Create/',
+                    data: $(this).serialize(),
+                    success: function (response) {
+
+                        $('#exampleModal').modal('hide');
+                        $('#authorizationForm')[0].reset();
+                        toastr.success('The Point Has Saved Successfully', { timeOut: 5000 })
+                        refreshTransactionsTable(userId);
+                    },
+                    error: function (xhr, status, error) {
+                        toastr.error('An Error Occured While Saving The Point', { timeOut: 5000 })
+                    }
+                });
+            });
+
+            function refreshTransactionsTable(UserId) {
+                $.ajax({
+                    url: '/UserPoints/GetUserPointsInDay?UserId='+UserId,
+                    type: 'GET',
+                    success: function (result) {
+                        $('table tbody').html($(result).find('table tbody').html());
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Failed to refresh the client table: ", error);
+                        alert("An error occurred while refreshing the table.");
+                    }
+                });
+            }
+        });
+    </script>
+}

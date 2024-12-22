@@ -1,4 +1,5 @@
-﻿@model IEnumerable<SimpleCrm.VM.UsersVm>
+﻿
+@model IEnumerable<SimpleCrm.VM.UsersVm>
 @{
     ViewData["Title"] = "Users";
 }
@@ -35,9 +36,13 @@
                     <td>@user.Role</td>
                     
                     <td>
-                        @if (user.Role=="Employee")
+                       
+                        @if (user.Role != "ProductionMangerA")
                         {
-                            <button onclick="deleteClient('@user.Id')" class="btn btn-outline-danger" type="button"><i class="bi bi-trash"></i> Delete</button>                            
+                            <button onclick="deleteClient('@user.Id')" class="btn btn-outline-danger" type="button"><i class="bi bi-trash"></i> Delete</button>
+                            <a href="\UserPoints\GetUserPointsInDay?UserId=@user.Id" class="btn btn-outline-primary" type="button"><i class="bi bi-star-half"></i> Points</a>
+                            <a href="\Reports\Index?UserId=@user.Id" class="btn btn-outline-success" type="button"><i class="bi bi-chat-left-dots-fill"></i> Reports</a>
+                            <a href="\Penalities\UserPenalities?EmployeeId=@user.Id" class="btn btn-outline-success" type="button"><i class="bi bi-bug"></i> Penalities</a>
                         }
                     </td>
                     
