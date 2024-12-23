@@ -1,8 +1,41 @@
 ﻿@model List<Attendance>
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
 @{
+    var userId = Context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
     ViewData["Title"] = "Attendance";
 }
 <h1 class="text-center">User Attendance</h1>
+@{
+    var s = Model;
+}@* 
+<a class="btn btn-success text-dark" href="/Attendances/ExportExcelSheet?UserId=@Model.FirstOrDefault()?.ApplicationUserId"><i class="bi bi-file-spreadsheet"></i> Export Attendance</a>
+ *@
+@if (Model.Where(z => z.Date.Date == DateTime.Now.Date).Count() == 0)
+{
+    <form asp-controller="Attendances" asp-action="Index" method="post" class="w-75 m-auto">
+        @Html.AntiForgeryToken()
+        <div class="form-group">
+            <input type="hidden" name="UserId" value="@userId" />
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-1">Exist</button>
+    </form>
+
+}
+else if (Model.Where(z => z.Date.Date == DateTime.Now.Date && z.CheckOut == TimeSpan.Zero).Count() > 0)
+{
+    <form asp-controller="Attendances" asp-action="Index" method="post" class="w-75 m-auto">
+        @Html.AntiForgeryToken()
+        <div class="form-group">
+            <input type="hidden" name="UserId" value="@userId" />
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-1">Leave</button>
+    </form>
+}
 <table class="text-center table table-bordered table-hover table-responsive">
     <thead class=" bg-black text-white">
         <tr>

@@ -62,7 +62,7 @@ namespace SimpleCrm.Controllers
                     {
                         if (!User.IsInRole(RolesEnum.Employee.ToString()))
                         {
-                            return RedirectToAction("Index", "Users");
+                            return RedirectToAction("Index", "Home");
                         }
                         else
                         {

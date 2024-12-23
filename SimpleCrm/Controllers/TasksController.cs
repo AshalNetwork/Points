@@ -16,6 +16,7 @@ namespace SimpleCrm.Controllers
     [Authorize]
     public class TasksController(IUnitOfWork _unitOfWork,UserManager<ApplicationUser> _userManager) : Controller
     {
+        [Authorize(Roles = "ProductionMangerA,ProductionMangerB,OperationManger")]
         public async Task<IActionResult> Index()
         {
             var Tasks = await _unitOfWork.Repository<Tasks>().GetAllWithSpecAsync(new GetAllTasksSpec());
@@ -47,7 +48,7 @@ namespace SimpleCrm.Controllers
             }).ToList();
             return View(mappedTasks);
         }
-
+        [Authorize(Roles = "ProductionMangerA,ProductionMangerB,OperationManger")]
         [HttpGet]
         public async Task<IActionResult> GetUserTasksForAdmins(string UserId, StatusEnums Status = StatusEnums.UnderReview)
         {
@@ -63,6 +64,7 @@ namespace SimpleCrm.Controllers
             }).ToList();
             return View();
         }
+      /*  [Authorize(Roles = "ProductionMangerA,ProductionMangerB,OperationManger")]
         public IActionResult Create()
         {
             var model = new CreateTaskVM
@@ -85,7 +87,7 @@ namespace SimpleCrm.Controllers
 
             return View(model);
         }
-
+*/
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateTaskVM model)
@@ -154,6 +156,7 @@ namespace SimpleCrm.Controllers
             }
 
         }
+        [Authorize(Roles = "ProductionMangerA,ProductionMangerB,OperationManger")]
         [HttpPut]       
         public async Task<IActionResult> CompleteTask(string TaskId)
         {
@@ -186,6 +189,7 @@ namespace SimpleCrm.Controllers
             }
 
         }
+        [Authorize(Roles = "ProductionMangerA,ProductionMangerB,OperationManger")]
         [HttpPost]
         public async Task<ActionResult> Delete(string Id)
         {

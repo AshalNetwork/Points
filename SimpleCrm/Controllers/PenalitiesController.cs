@@ -47,6 +47,7 @@ namespace SimpleCrm.Controllers
             }).ToList();
             return View(mappedPenalities);
         }
+        [Authorize(Roles = "ProductionMangerA,ProductionMangerB,OperationManger")]
         public IActionResult Create()
         {
             var model = new CreatePenalityDto
@@ -88,6 +89,7 @@ namespace SimpleCrm.Controllers
             }
             return View(model);
         }
+        [Authorize(Roles = "ProductionMangerA,ProductionMangerB,OperationManger")]
         [HttpPost]
         public async Task<ActionResult> Delete(string Id)
         {

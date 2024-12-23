@@ -19,12 +19,8 @@
             @foreach (var task in Model)
             {
                 <tr>
-                    <td>@if (@task.Description.Length > 150)
-                        {
-                            @task.Description.Substring(0, 150) 
-                        }else{
-                         @task.Description
-                        }
+                    <td>
+                        @Html.Raw(task.Description)
                     </td>
                     <td>@task.Date</td>
                     <td>
@@ -70,7 +66,7 @@
 
             // Set the content in the modal
             const modalBody = descriptionModal.querySelector('#fullDescription');
-            modalBody.textContent = description;
+            modalBody.innerHTML = description;
         });
     });
 </script>
