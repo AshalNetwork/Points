@@ -34,7 +34,7 @@ namespace SimpleCrm.Controllers
         }
         public async Task<IActionResult> UserTasks()
         {
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            string userId = User.Claims.FirstOrDefault(z=>z.Type==ClaimTypes.NameIdentifier)!.Value;
             var Tasks = await _unitOfWork.Repository<Tasks>().GetAllWithSpecAsync(new GetMyDayTasksSpec(userId));
             var mappedTasks = Tasks.Select(z => new GetMyDailyTasksVM
             {
