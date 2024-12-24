@@ -11,6 +11,7 @@ namespace SimpleCrm.VM
         [Required]
         [DataType(DataType.Password)]
         public string Password { get; set; }
+        public string? DeviceId { get; set; } 
 
         public bool RememberMe { get; set; }
     }

@@ -16,7 +16,8 @@
                             <div class="form-left h-100 py-5 px-5">
                                 <p asp-validation-summary="All" class="text-danger"></p>
 
-                                <form asp-action="Login" class="row g-4">
+                                <form asp-action="Login" id="form" class="row g-4">
+                                    <input asp-for="DeviceId" id="deviceId" type="type" value="" hidden />
                                     <div class="col-12">
                                         <label asp-for="Email"> Email <span class="text-danger">*</span></label>
                                         <div class="input-group">
@@ -37,7 +38,6 @@
                                             </div>
                                         </div>
                                     </div>
-                                                                       
 
                                     <div class="col-sm-6">
                                         <a class="text-primary" asp-controller="Account" asp-action="ForgotPassword">Forgot Password?</a>
@@ -62,7 +62,26 @@
     </div>
 </div>
 
-
+<script>
+    function returnDeviceId() {
+    let deviceId = localStorage.getItem('deviceId');
+    if (deviceId === null) {
+    // If no device ID, generate a new one (could use UUID or any other method)
+    deviceId = 'device-' + Date.now() + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem('deviceId', deviceId);
+    }
+    return deviceId;
+    }
+    let value=document.getElementById("deviceId")
+    let dev=returnDeviceId()
+    if(localStorage.getItem("deviceId") === null) {
+        localStorage.setItem("deviceId",dev)
+        value.value=dev
+    }
+    else
+        value.value=returnDeviceId()
+  
+</script>
 
 
 

@@ -28,7 +28,7 @@ namespace SimpleCrm.Controllers
         [HttpGet]
         public IActionResult Login()
         {
-            return View();
+            return View(new LoginViewModel());
         }
 
         // POST: /Account/Login
@@ -36,8 +36,17 @@ namespace SimpleCrm.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
         {
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user.DeviceId != null && model.DeviceId != user.DeviceId)
+            {
+
+                return View(model);
+
+            }
             if (ModelState.IsValid)
             {
+                
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
@@ -56,8 +65,15 @@ namespace SimpleCrm.Controllers
                     //        CheckIn = egyptTime.TimeOfDay,
                     //    });
                     //}
-                  
+
                     //await unitOfWork.Complete();
+
+                   
+                     if(user.DeviceId==null)
+                    {
+                        user.DeviceId = model.DeviceId;
+                        await _unitOfWork.Complete();
+                    }
                     if (string.IsNullOrEmpty(returnUrl) || !Url.IsLocalUrl(returnUrl))
                     {
                         if (!User.IsInRole(RolesEnum.Employee.ToString()))
