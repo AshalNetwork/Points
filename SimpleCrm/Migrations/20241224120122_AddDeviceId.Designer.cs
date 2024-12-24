@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SimpleCrm.Contexts;
 
@@ -11,9 +12,11 @@ using SimpleCrm.Contexts;
 namespace SimpleCrm.Migrations
 {
     [DbContext(typeof(PointsDbContext))]
-    partial class PointsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241224120122_AddDeviceId")]
+    partial class AddDeviceId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -302,39 +305,6 @@ namespace SimpleCrm.Migrations
                     b.ToTable("PointsValues");
                 });
 
-            modelBuilder.Entity("SimpleCrm.Models.Project", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("Ended")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Objectives")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ProjectManger")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("StartedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("PointsValues", (string)null);
-                });
-
             modelBuilder.Entity("SimpleCrm.Models.Report", b =>
                 {
                     b.Property<Guid>("Id")
@@ -430,6 +400,9 @@ namespace SimpleCrm.Migrations
                     b.Property<int>("PointType")
                         .HasColumnType("int");
 
+                    b.Property<Guid?>("TaskId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -438,6 +411,8 @@ namespace SimpleCrm.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("TaskId");
 
                     b.HasIndex("UserId");
 
@@ -577,11 +552,17 @@ namespace SimpleCrm.Migrations
 
             modelBuilder.Entity("SimpleCrm.Models.UserPoint", b =>
                 {
+                    b.HasOne("SimpleCrm.Models.Tasks", "Task")
+                        .WithMany()
+                        .HasForeignKey("TaskId");
+
                     b.HasOne("SimpleCrm.Models.ApplicationUser", "User")
                         .WithMany("UserPoints")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Task");
 
                     b.Navigation("User");
                 });
