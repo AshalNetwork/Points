@@ -29,10 +29,14 @@
                     <td>@task.EndDate</td>
 
                     <td>
-                        
-                       @*   <button onclick="deleteTask('@task.Id')" class="btn btn-outline-danger" type="button"><i class="bi bi-trash"></i> Delete</button>
-                          *@
-                            <button onclick="CompleteTask('@task.Id')" class="btn btn-outline-success" type="button"><i class="bi bi-check-circle"></i> Complete</button>                        
+                        @if (task.Status == "UnderReview")
+                        {
+                            <button onclick="CompleteTask('@task.Id')" class="btn btn-outline-success" type="button"><i class="bi bi-check-circle"></i> Complete</button>
+                        }
+                        @if (task.Status == "InProgress" || task.Status == "Pending")
+                        {
+                            <button onclick="ShiftTask('@task.Id')" class="btn btn-outline-primary" type="button"><i class="bi bi-trash"></i> Shift</button>
+                        }
                     </td>
 
                 </tr>

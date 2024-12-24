@@ -207,6 +207,20 @@ function CompleteTask(taskId) {
         }
     });
 }
+/*******************************Shift Task******************************************** */
+function ShiftTask(taskId) {
+    $.ajax({
+        url: '/Tasks/Shift?TaskId=' + taskId,
+        type: 'PUT',
+        success: function () {
+            refreshTable('/Tasks/Index');
+            toastr.success('Task has been Shifted To Tomorrow', 'Success');
+        },
+        error: function () {
+            toastr.error('Failed to update task. Please try again.', 'Error');
+        }
+    });
+}
 /*******************************MAde The Task Under Review ******************************************** */
 function UnderReview(taskId) {
     $.ajax({
@@ -235,6 +249,39 @@ function InProgressTask(taskId) {
         }
     });
 }
+/*******************************End Project******************************************** */
+
+function EndProject(projectId) {
+    // Show confirmation dialog
+    $.confirm({
+        title: 'confirm Request',
+        content: 'Are you sure you want Ending This Project?',
+        buttons: {
+            confirm: {
+                text: 'Confirm',
+                btnClass: 'btn-success',
+                action: function () {
+                    // AJAX request
+                    $.ajax({
+                        url: '/Projects/MarkAsEnded?Id=' + projectId,
+                        type: 'put',
+                        success: function (response) {                            
+                            toastr.success('The Project Has Ended successfully!', 'Success', { timeOut: 5000 })
+
+                        },
+                        error: function (xhr, status, error) {
+                            console.log("Error:", error);  // Log the error for debugging
+                            toastr.error('An error occurred while Ending The Project', 'Error!')
+                        }
+                    });
+                }
+            },
+            cancel: function () {
+
+            }
+        }
+    });
+}; 
 /*******************************Refresh The Table******************************************** */
 function refreshTable(url,UserId) {
     $.ajax({

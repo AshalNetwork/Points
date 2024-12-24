@@ -4,15 +4,15 @@
 @inject UserManager<ApplicationUser> UserManager
 @{
     var userId = Context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    var userRole =User.Claims.FirstOrDefault(z=>z.Type==ClaimTypes.Role)!.Value;
 
     ViewData["Title"] = "Attendance";
 }
 <h1 class="text-center">User Attendance</h1>
-@{
-    var s = Model;
-}@* 
-<a class="btn btn-success text-dark" href="/Attendances/ExportExcelSheet?UserId=@Model.FirstOrDefault()?.ApplicationUserId"><i class="bi bi-file-spreadsheet"></i> Export Attendance</a>
- *@
+@if(userRole!="Employee")
+{
+<button class="btn btn-success text-dark" id="processAttendanceBtn"><i class="bi bi-file-spreadsheet"></i> Export Attendance</button>
+}
 @if (Model.Where(z => z.Date.Date == DateTime.Now.Date).Count() == 0)
 {
     <form asp-controller="Attendances" asp-action="Index" method="post" class="w-75 m-auto">
@@ -36,7 +36,7 @@ else if (Model.Where(z => z.Date.Date == DateTime.Now.Date && z.CheckOut == Time
         <button type="submit" class="btn btn-primary mt-1">Leave</button>
     </form>
 }
-<table class="text-center table table-bordered table-hover table-responsive">
+<table id="attendanceTable" class="text-center table table-bordered table-hover table-responsive">
     <thead class=" bg-black text-white">
         <tr>
             <th scope="col">Date</th>
@@ -64,3 +64,37 @@ else if (Model.Where(z => z.Date.Date == DateTime.Now.Date && z.CheckOut == Time
         }
     </tbody>
 </table>
+
+@section Scripts{
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+ <script>
+        $(document).ready(function () {
+            $("#processAttendanceBtn").click(function () {
+                // Prepare the table data for export
+                const attendanceList = [];
+                $("#attendanceTable tbody tr").each(function () {
+                    const row = {
+                        Date: $(this).find("td:nth-child(1)").text(),
+                        CheckIn: $(this).find("td:nth-child(2)").text(),
+                        Checkout: $(this).find("td:nth-child(3)").text(),
+                        Late: $(this).find("td:nth-child(4)").text(),
+                    };
+                    attendanceList.push(row);
+                });
+
+                const workbook = XLSX.utils.book_new();
+                const worksheet = XLSX.utils.json_to_sheet(attendanceList.reverse(), { origin: "A2" }); 
+
+                // Add a title row spanning 4 columns
+                worksheet["A1"] = { v: "Attendance Report", t: "s" }; 
+                worksheet["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }]; // Merge A1:D1
+
+                // Append the worksheet to the workbook
+                XLSX.utils.book_append_sheet(workbook, worksheet, "Attendance");
+
+                // Generate the Excel file and trigger download
+                XLSX.writeFile(workbook, "Attendance.xlsx");
+            });
+        });
+    </script>
+}

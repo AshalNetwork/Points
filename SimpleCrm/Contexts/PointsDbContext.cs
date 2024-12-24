@@ -19,6 +19,7 @@ namespace SimpleCrm.Contexts
         public DbSet<Penality> Penalities { get; set; }
         public DbSet<Report> Reports { get; set; }
         public DbSet<Sale> Sales { get; set; }
+        public DbSet<Project> Projects { get; set; }
         
     }
 }

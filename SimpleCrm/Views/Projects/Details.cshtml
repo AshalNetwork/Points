@@ -1,0 +1,24 @@
+﻿@model SimpleCrm.Models.Project
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+@{
+    var userRole = User.Claims.FirstOrDefault(z=>z.Type==ClaimTypes.NameIdentifier)?.Value;
+    ViewData["Title"] = "Project Details";
+}
+
+
+<h2 class="text-center">Project Details</h2>
+<h2>Title: @Model.Title</h2>
+<h3>Project Manger: @Model.ProjectManger</h3>
+<h3>Status: @(Model.Ended == true?"Ended":"Under Production")</h3>
+<h3>StartedAt: @Model.StartedAt.ToString("yyyy-MM-dd")</h3>
+<p><h3>Description:</h3> @Html.Raw(Model.Description)</p>
+<p>Objectives: @Html.Raw(Model.Objectives)</p>
+@if (userRole != "Employee")
+{
+    if (Model.Ended == false)
+    {
+        <button onclick="EndProject('@Model.Id')" class="btn btn-outline-success" type="button"><i class="bi bi-check-circle"></i> End</button>
+    }
+}

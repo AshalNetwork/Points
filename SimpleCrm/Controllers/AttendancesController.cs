@@ -52,7 +52,7 @@ namespace SimpleCrm.Controllers
                     attendances.CheckOut = egyptTime.TimeOfDay;
             } 
             await unitOfWork.Complete();
-            return Ok();
+            return RedirectToAction("UserTasks", "Tasks");
         }
         [Authorize]
         public async Task<ActionResult> GetUserAttendance(string UserId)
@@ -61,28 +61,6 @@ namespace SimpleCrm.Controllers
                 GetAllWithSpecAsync(new GetMonthlyAttendances(UserId));
             return View(attendances);
         }
-        [HttpPost]
-        public async Task<ActionResult> ExportExcelSheet(string userId)
-        {
-            if (string.IsNullOrEmpty(userId))
-                return NotFound();
-            var attendances = await unitOfWork.Repository<Attendance>().
-                GetAllWithSpecAsync(new GetMonthlyAttendances(userId));
-            var dt = GenerateExcel.GenerateAttendanceSheet(attendances.ToList());
-            // Create a new Excel workbook and add the data
-            using (var workbook = new XLWorkbook())
-            {
-                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-                var worksheet = workbook.Worksheets.Add(dt);
-
-                using (var stream = new MemoryStream())
-                {
-                    workbook.SaveAs(stream);
-                    workbook.SaveAs(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/AttendanceSheets", "sheet.xlsx"));
-                    var content = stream.ToArray();
-                    return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "sheet.xlsx");
-                }
-            }
-        }
+      
     }
 }
