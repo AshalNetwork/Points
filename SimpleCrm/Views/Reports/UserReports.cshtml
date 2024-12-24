@@ -25,7 +25,7 @@
             @foreach (var task in Model)
             {
                 <tr>
-                    <td style="word-wrap:anywhere">@task.Description</td>
+                    <td style="word-wrap:anywhere">@Html.Raw(task.Description)</td>
                     <td>@task.Date</td>
                 </tr>
             }

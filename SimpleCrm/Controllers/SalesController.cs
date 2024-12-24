@@ -29,7 +29,7 @@ namespace SimpleCrm.Controllers
         }
         public async Task<IActionResult> GetUserSales()
         {
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            string userId = User.Claims.FirstOrDefault(z=>z.Type==ClaimTypes.NameIdentifier)!.Value;
 
             var sales = await _unitOfWork.Repository<Sale>().GetAllWithSpecAsync(new GetAllSalesSpec(userId));
             var mappedSales = sales.Select(z => new AllSalesRequestsVM

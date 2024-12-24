@@ -1,60 +1,105 @@
 ﻿ @* @model List<SimpleCrm.VM.GetMyDailyTasksVM> *@ 
 @{
-    ViewData["Title"] = "User Tasks";
+    ViewData["Title"] = "User Tasks";  
 }
+<style>
+    .cardCss{
+        height:175px;
+        border-radius:5px;      
+    }
+
+    .cardCss .desc{
+        display: -webkit-box;
+        -webkit-line-clamp: 3; 
+        -webkit-box-orient: vertical; 
+        overflow: hidden;
+    }
+
+     .cardCss .card-title{
+        display: -webkit-box; 
+        -webkit-line-clamp: 2; 
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    } 
+</style>
  <h1 class="text-center mt-5">User Tasks</h1>
-<div class="row">
-    <div class="row mb-3">
-        <div class="col-12">
-            <select id="statusFilter" class="form-select" style="width: 200px; margin: 0 auto;">
-                <option value="All">All</option>
-                <option value="1">Pending</option>
-                <option value="2">In Progress</option>
-                <option value="3" selected>Under Review</option>
-                <option value="4">Completed</option>
-            </select>
-        </div>
+<div class="row mb-2">
+    <div class="col-md-6 col-sm-12">
+        <button type="button" class="btn btn-success" aria-current="page"
+                data-bs-toggle="modal"
+                data-bs-target="#exampleModal">
+            <i class="bi bi-plus"></i> Add Task
+        </button>
     </div>
-    <div class="row" id="tasksContainer"> 
-        </div>
-   @*   @foreach (var item in Model)
-    {
-            <div class="col-sm-12 col-md-3 mb-2 task-card" data-status="@item.Status">
-            <div class="card" style="width: 18rem;">
-                <div class="card-body">
-                    <p class="d-none">@item.Id</p>
-                    <h5 class="card-title text-center"> @item.Title</h5>
-                    <p class="card-text">@item.Description</p>
-                    <p class="card-text">
-                        DeadLine: @item.EndDate
+    <div class="col-md-6 col-sm-12">
+        <select id="statusFilter" class="form-select" style="width: 200px; margin: 0 auto;">
+            <option value="1">Pending</option>
+            <option value="2">In Progress</option>
+            <option value="3" selected>Under Review</option>
+            <option value="4">Completed</option>
+        </select>
+    </div>
+</div>
+  
+<div class="row" id="tasksContainer"> 
 
-                        @if (item.Status == "Pending")
-                        {
-                            <span class="text-info"> @item.Status</span>
-                        }
-                        @if (item.Status == "InProgress")
-                        {
-                            <span class="text-primary"> @item.Status</span>
-                        }
-                        @if (item.Status == "UnderReview")
-                        {
-                            <span class="text-success"> @item.Status</span>
-                        }
-                        @if (item.Status == "Completed")
-                        {
-                            <span class="text-primary"> @item.Status</span>
-                        }
+</div>
+  
+ 
 
-                    </p>
-                    @if (item.Status == "UnderReview")
-                    {
-                        <button onclick="CompleteTask('@item.Id')" class="btn btn-primary" type="button"><i class="bi bi-check-circle"></i> Complete</button>
-                    }
-                </div>
+
+<!-- PoP Up-->
+ 
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5 text-center" id="exampleModalLabel">Add Task</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="authorizationForm" method="post" autocomplete="off">
+                    @Html.AntiForgeryToken()
+                    <div class="form-group d-none">
+                        <input type="text" name="UserId" id="userIdInput" class="form-control" readonly />
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Title</label>
+                        <input name="Title"  class="form-control" placeholder="Enter the Title" data-val="true" data-val-required="Then Title Field Is Required" required />
+                        <span class="text-danger" data-valmsg-for="Title" data-valmsg-replace="true"></span>
+                    </div>
+                    <div class="form-group d-none">
+                        <label class="control-label">Status</label>
+                        <input name="Status" class="form-control" value="1"/>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Description</label>
+                        <input name="Description" class="form-control" placeholder="Enter the Description" data-val="true" />
+                        <span class="text-danger" data-valmsg-for="Description" data-valmsg-replace="true"></span>
+                    </div>
+
+
+                    <div>
+                        <label>StartAt</label>
+                        <input name="StartAt" type="date" class="form-control" data-val="true" required/>
+                        <span class="text-danger" data-valmsg-for="StartAt" data-valmsg-replace="true"></span>
+                    </div>
+                    <div>
+                        <label>EndAt</label>
+                        <input name="EndAt" type="date" class="form-control" data-val="true" required />
+                        <span class="text-danger" data-valmsg-for="EndAt" data-valmsg-replace="true"></span>
+                    </div>
+
+                    <div class="form-group m-1">
+                        <input type="submit" value="Save" class="btn btn-primary" />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
-    }   *@
-    
+    </div>
 </div>
  
 @section Scripts{
@@ -90,10 +135,10 @@
                     tasks.forEach(task => {
                         const taskCard = `
                         <div class="col-sm-12 col-md-3 mb-2">
-                            <div class="card" style="width: 18rem;">
+                            <div class="card cardCss" style="width: 18rem;">
                                 <div class="card-body">
                                     <h5 class="card-title text-center">${task.title}</h5>
-                                    <p class="card-text">${task.description}</p>
+                                    <p class="card-text desc">${task.description}</p>
                                     <p class="card-text">
                                         DeadLine: ${task.endDate}
                                         <span class="text-info">${task.status}</span>
@@ -105,14 +150,54 @@
                         tasksContainer.append(taskCard);
                     });
                 } else {
-                    tasksContainer.html('<p class="text-center">No tasks found.</p>');
+                    tasksContainer.html('<p class="text-center alert alert-success">No tasks found.</p>');
                 }
             },
                     error: function () {
                         toastr.error('Failed to update task. Please try again.', 'Error');
                     }
                 });
+            
 
+            // When the Add Point button is clicked, populate the UserId field in the modal
+            $('#exampleModal').on('show.bs.modal', function () {
+                $('#userIdInput').val(userId);
+            });
+            $('#authorizationForm').on('submit', function (event) {
+                event.preventDefault();
+                let isValid = true;
+                $(this).find('input, select').each(function () {
+                    if (!this.checkValidity()) {
+                        isValid = false;
+                        $(this).addClass('is-invalid');  // Highlight invalid fields
+                        $(this).next('.text-danger').text(this.validationMessage).show();  // Show custom error message below the input
+                    } else {
+                        $(this).removeClass('is-invalid');
+                        $(this).next('.text-danger').text('').hide();  // Hide error message if valid
+                    }
+                });
+
+                if (!isValid) {
+                    return;  // Stop form submission if validation fails
+                }
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/Tasks/Create/',
+                    data: $(this).serialize(),
+                    success: function (response) {
+
+                        $('#exampleModal').modal('hide');
+                        $('#authorizationForm')[0].reset();
+                        toastr.success('The Task Has Saved Successfully', { timeOut: 5000 })
+                        //refreshTable('/UserPoints/GetUserPointsInDay', userId);
+                    },
+                    error: function (xhr, status, error) {
+                        toastr.error('An Error Occured While Saving The Task', { timeOut: 5000 })
+                    }
+                });
+            });
+            
             }
     </script>
 }

@@ -4,16 +4,6 @@
 }
 <div>
     <h1 class="text-center">All Tasks</h1>
-    <div class="row mb-2">
-        <div class="col-md-6 col-sm-12">
-            <div class="btn-group">
-                <a class="btn btn-success" aria-current="page" asp-action="Create"><i class="bi bi-plus"></i>Create New Task</a>
-            </div>
-        </div>
-        <div class="col-md-2 col-sm-0"></div>
-
-    </div>
-
 
     <table class="table table-bordered table-hover table-responsive">
         <thead class="text-center bg-black text-white">
@@ -39,14 +29,10 @@
                     <td>@task.EndDate</td>
 
                     <td>
-                        @if (task.Role == "Employee")
-                        {
-                            <button onclick="deleteTask('@task.Id')" class="btn btn-outline-danger" type="button"><i class="bi bi-trash"></i> Delete</button>
-                        }
-                        @if (task.Status == "UnderReview")
-                        {
-                            <button onclick="CompleteTask('@task.Id')" class="btn btn-outline-success" type="button"><i class="bi bi-check-circle"></i> Complete</button>
-                        }
+                        
+                       @*   <button onclick="deleteTask('@task.Id')" class="btn btn-outline-danger" type="button"><i class="bi bi-trash"></i> Delete</button>
+                          *@
+                            <button onclick="CompleteTask('@task.Id')" class="btn btn-outline-success" type="button"><i class="bi bi-check-circle"></i> Complete</button>                        
                     </td>
 
                 </tr>
