@@ -28,6 +28,10 @@ namespace SimpleCrm.Controllers
         [HttpGet]
         public IActionResult Login()
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction( "UserTasks", "Tasks");  // Redirect to Home page
+            }
             return View(new LoginViewModel());
         }
 
