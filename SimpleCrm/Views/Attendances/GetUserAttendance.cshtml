@@ -5,11 +5,10 @@
 @{
     var userId = Context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
     var userRole =User.Claims.FirstOrDefault(z=>z.Type==ClaimTypes.Role)!.Value;
-
-    ViewData["Title"] = "Attendance";
+    ViewData["Title"] = $"{ViewBag.Name} Attendance";
 }
-<h1 class="text-center">User Attendance</h1>
-@if(userRole!="Employee")
+<h3 class="text-center m-5">@($"{ViewBag.Name} Attendance") </h3>
+@if (userRole != "Employee")
 {
 <button class="btn btn-success text-dark" id="processAttendanceBtn"><i class="bi bi-file-spreadsheet"></i> Export Attendance</button>
 }
@@ -27,6 +26,8 @@
 }
 else if (Model.Where(z => z.Date.Date == DateTime.Now.Date && z.CheckOut == TimeSpan.Zero).Count() > 0)
 {
+    if(DateTime.Now.Hour>14)
+    {
     <form asp-controller="Attendances" asp-action="Index" method="post" class="w-75 m-auto">
         @Html.AntiForgeryToken()
         <div class="form-group">
@@ -35,6 +36,7 @@ else if (Model.Where(z => z.Date.Date == DateTime.Now.Date && z.CheckOut == Time
 
         <button type="submit" class="btn btn-primary mt-1">Leave</button>
     </form>
+    }
 }
 <table id="attendanceTable" class="text-center table table-bordered table-hover table-responsive">
     <thead class=" bg-black text-white">
@@ -49,16 +51,31 @@ else if (Model.Where(z => z.Date.Date == DateTime.Now.Date && z.CheckOut == Time
     <tbody>
         @foreach (var task in Model)
         {
+            
             <tr>
                 <td>@task.Date.Day - @task.Date.Month - @task.Date.Year </td>
                 <td>@task.CheckIn.Hours : @task.CheckIn.Minutes</td>
                 <td>@task.CheckOut.Hours : @task.CheckOut.Minutes</td>
                 <td>
                     @{
-                        var egyptTime = new TimeSpan(9, 0, 0);
-                        var lat = @task.CheckIn - @egyptTime;
+                        var user = await UserManager.FindByIdAsync(task.ApplicationUserId);
+                        var egyptTime = new TimeSpan();
+                        TimeSpan late = new TimeSpan();
+
+                        if (user.Email.ToLower() == "sy034692@gmail.com")
+                        {
+                            egyptTime = new TimeSpan(13, 0, 0);
+                            if (task.CheckIn > new TimeSpan(13, 0, 0))
+                                late = task.CheckIn - egyptTime;
+                        }
+                        else
+                        {
+                            egyptTime = new TimeSpan(9, 0, 0);
+                            if (task.CheckIn > new TimeSpan(9, 0, 0))
+                                late = task.CheckIn - egyptTime;
+                        }
                     }
-                    @lat.Hours : @lat.Minutes : @lat.Seconds
+                    @late.Hours: @late.Minutes : @late.Seconds
                 </td>
             </tr>
         }

@@ -6,6 +6,8 @@ namespace SimpleCrm.Specification
     {
         public GetUserPenalitiesSpec(string UserId) : base(z => z.UserId == UserId)
         {
+            Includes.Add(z => z.User);
+
             OrderByDesc = z => z.Date;
         }
         public GetUserPenalitiesSpec() : base()

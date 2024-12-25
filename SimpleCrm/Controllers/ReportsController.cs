@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Drawing.Diagrams;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -14,22 +15,26 @@ using System.Security.Claims;
 namespace SimpleCrm.Controllers
 {
     [Authorize]
-    public class ReportsController(IUnitOfWork _unitOfWork) : Controller
+    public class ReportsController(IUnitOfWork _unitOfWork,UserManager<ApplicationUser> _userManager) : Controller
     {
         public async Task<IActionResult> Index(string UserId)
         {
+            ViewBag.Name = _userManager.FindByIdAsync(UserId).Result?.Name ?? string.Empty;
+
             var reports = await _unitOfWork.Repository<Report>().GetAllWithSpecAsync(new GetUserReportsSpec(UserId));
             var mappedReports = reports.Select(z => new UserReportsVM
             {
                 Id = z.Id,
                 Description = z.Description,
                 Date = z.Date.ToString(),
+                User = z.User.Name
             }).ToList();
             return View(mappedReports);
         }
         public async Task<IActionResult> UserReports()
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            ViewBag.Name = _userManager.FindByIdAsync(userId).Result?.Name ?? string.Empty;
 
             var reports = await _unitOfWork.Repository<Report>().GetAllWithSpecAsync(new GetUserReportsSpec(userId));
             var mappedReports = reports.Select(z => new UserReportsVM
@@ -37,6 +42,7 @@ namespace SimpleCrm.Controllers
                 Id = z.Id,
                 Description = z.Description,
                 Date = z.Date.ToString(),
+                User = z.User.Name,
             }).ToList();
             return View(mappedReports);
         }

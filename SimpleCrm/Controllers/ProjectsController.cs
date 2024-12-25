@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using DocumentFormat.OpenXml.Office2010.Excel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -67,6 +68,40 @@ namespace SimpleCrm.Controllers
                 try
                 {
                     await _unitOfWork.Repository<Project>().Add(project);
+                    await _unitOfWork.Complete();
+                    return RedirectToAction("Index", "Projects");
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError(string.Empty, ex.Message);
+                }
+            }
+            return View(model);
+        }
+        public async Task<IActionResult> Edit(Guid Id)
+        {
+            var project  = await _unitOfWork.Repository<Project>().GetBYIdAsync(Id);
+            if (project == null)
+                return NotFound();
+            return View(project);
+        }
+
+        [HttpPut]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(Guid Id,Project model)
+        {
+            var project = await _unitOfWork.Repository<Project>().GetBYIdAsync(Id);
+         
+            if (ModelState.IsValid)
+            {
+
+                try
+                {
+                    project.Title = model.Title;
+                    project.Description = model.Description;
+                    project.Objectives = model.Objectives;
+                    project.ProjectManger = model.ProjectManger;
+                    _unitOfWork.Repository<Project>().Update(project);
                     await _unitOfWork.Complete();
                     return RedirectToAction("Index", "Projects");
                 }

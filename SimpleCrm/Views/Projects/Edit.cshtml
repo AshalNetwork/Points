@@ -1,0 +1,82 @@
+﻿@model SimpleCrm.Models.Project;
+
+@{
+    ViewData["Title"] = "Edit Project";
+}
+
+<h2 class="text-center">Edit Project</h2>
+<div class="w-75 m-auto">
+    <form asp-action="Edit" method="post" autocomplete="off">
+        @Html.AntiForgeryToken()
+        <input asp-for="Id" class="form-control" hidden/>
+        <div class="form-group">
+            <label asp-for="Title" class="control-label"></label>
+            <input asp-for="Title" class="form-control" />
+            <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="ProjectManger"></label>
+            <input asp-for="ProjectManger" class="form-control" placeholder="Enter The Project Manger Name" />
+            <span asp-validation-for="ProjectManger" class="text-danger"></span>
+        </div>
+        <div>
+            <label asp-for="StartedAt"></label>
+            <input asp-for="StartedAt" type="date" class="form-control" />
+            <span asp-validation-for="StartedAt" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Description"></label>
+            <textarea id="description" asp-for="Description" class="form-control" placeholder="Enter The Description"></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Objectives"></label>
+            <textarea id="objectives" asp-for="Objectives" class="form-control" placeholder="Enter The Objectives"></textarea>
+            <span asp-validation-for="Objectives" class="text-danger"></span>
+        </div>
+        <div class="form-group m-1">
+            <input type="submit" value="Save" class="btn btn-primary" />
+        </div>
+    </form>
+    <div class="ml-2">
+        <a asp-action="Index" asp-controller="Home">Back to Home</a>
+    </div>
+</div>
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+<script src="https://cdn.ckeditor.com/ckeditor5/39.0.0/classic/ckeditor.js"></script>
+<script>
+    ClassicEditor.create(document.querySelector('#description'), {
+        toolbar: ['bold', 'italic', 'underline', 'bulletedList', 'numberedList', 'blockQuote'],
+        language: 'en' // Arabic language support
+    });
+    ClassicEditor.create(document.querySelector('#objectives'), {
+        toolbar: ['bold', 'italic', 'underline', 'bulletedList', 'numberedList', 'blockQuote'],
+        language: 'en' // Arabic language support
+    });
+</script>ipt>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const reasonDropdown = document.getElementById('reasonDropdown');
+        const customReasonInput = document.getElementById('customReasonInput');
+        const selectedText = reasonDropdown.options[reasonDropdown.selectedIndex].text;
+
+        if (selectedText === 'Custom') {
+            customReasonInput.style.display = 'block'; // Show input field
+        } else {
+            customReasonInput.style.display = 'none'; // Hide input field
+        }
+        reasonDropdown.addEventListener('change', function () {
+            const selectedText = reasonDropdown.options[reasonDropdown.selectedIndex].text;
+
+            if (selectedText === 'Custom') {
+                customReasonInput.style.display = 'block'; // Show input field
+            } else {
+                customReasonInput.style.display = 'none'; // Hide input field
+            }
+        });
+    });
+</script>

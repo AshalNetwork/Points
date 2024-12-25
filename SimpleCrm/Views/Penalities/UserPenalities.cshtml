@@ -1,9 +1,9 @@
 ﻿@model IEnumerable<SimpleCrm.VM.UserPenalitiesVM>
 @{
-    ViewData["Title"] = "My Penalities";
+    ViewData["Title"] = $"{ViewBag.Name} Penalities";
 }
 <div>
-    <h1 class="text-center">My Penalities</h1>
+    <h3 class="text-center m-5">@($"{ViewBag.Name} Penalities") </h3>
 
 
     <table class="table table-bordered table-hover table-responsive">

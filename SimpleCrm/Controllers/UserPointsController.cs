@@ -23,6 +23,8 @@ namespace SimpleCrm.Controllers
         public async Task<IActionResult> GetUserPointsInDay(string UserId)
         {
             var user =await  _userManager.FindByIdAsync(UserId);
+            ViewBag.Name = user?.Name ?? string.Empty;
+
             if (user == null)
             {
                 return NotFound();

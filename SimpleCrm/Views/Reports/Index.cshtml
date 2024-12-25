@@ -1,10 +1,9 @@
 ﻿@model IEnumerable<SimpleCrm.VM.UserReportsVM>
 @{
-    ViewData["Title"] = "Reports";
+    ViewData["Title"] = $"{ViewBag.Name} Reports";
 }
 <div>
-    <h1 class="text-center">All Reports</h1>
-
+    <h3 class="text-center m-5">@($"{ViewBag.Name} Reports") </h3>
 
     <table class="table table-bordered table-hover table-responsive">
         <thead class="text-center bg-black text-white">

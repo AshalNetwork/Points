@@ -1,4 +1,10 @@
-﻿@model List<Attendance>
+﻿@using Microsoft.AspNetCore.Identity
+@model List<Attendance>
+@inject UserManager<ApplicationUser> UserManager
+@{
+    ViewData["Title"] = "ToDay Attendance";
+}
+<h1 class="text-center m-5">ToDay Attendance</h1>
 <table class="text-center table table-bordered table-hover table-responsive mt-5">
     <thead class="text-center bg-black text-white">
         <tr>
@@ -17,10 +23,24 @@
                 <td scope="col">@task.CheckOut.Hours : @task.CheckOut.Minutes</td>
                 <td>
                     @{
-                        var egyptTime = new TimeSpan(9, 0, 0);
-                        var lat = @task.CheckIn - @egyptTime;
+                        var user = await UserManager.FindByIdAsync(task.ApplicationUserId);
+                        var egyptTime = new TimeSpan();
+                        TimeSpan late = new TimeSpan();
+
+                        if (user.Email.ToLower() == "sy034692@gmail.com")
+                        {
+                            egyptTime = new TimeSpan(13, 0, 0);
+                            if (task.CheckIn > new TimeSpan(13, 0, 0))
+                                late = task.CheckIn - egyptTime;
+                        }
+                        else
+                        {
+                            egyptTime = new TimeSpan(9, 0, 0);
+                            if (task.CheckIn > new TimeSpan(9, 0, 0))
+                                late = task.CheckIn - egyptTime;
+                        }
                     }
-                    @lat.Hours : @lat.Minutes : @lat.Seconds
+                    @late.Hours : @late.Minutes : @late.Seconds
                 </td>
             </tr>
         }

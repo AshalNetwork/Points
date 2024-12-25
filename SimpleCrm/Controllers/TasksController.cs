@@ -36,6 +36,8 @@ namespace SimpleCrm.Controllers
         public async Task<IActionResult> UserTasks()
         {
             string userId = User.Claims.FirstOrDefault(z=>z.Type==ClaimTypes.NameIdentifier)!.Value;
+            ViewBag.Name = _userManager.FindByIdAsync(userId).Result?.Name ?? string.Empty;
+
             var Tasks = await _unitOfWork.Repository<Tasks>().GetAllWithSpecAsync(new GetMyDayTasksSpec(userId));
             var mappedTasks = Tasks.Select(z => new GetMyDailyTasksVM
             {
@@ -52,6 +54,8 @@ namespace SimpleCrm.Controllers
         [HttpGet]
         public async Task<IActionResult> GetUserTasksForAdmins(string UserId, StatusEnums Status = StatusEnums.UnderReview)
         {
+            ViewBag.Name = _userManager.FindByIdAsync(UserId).Result?.Name ?? string.Empty;
+
             var Tasks = await _unitOfWork.Repository<Tasks>().GetAllWithSpecAsync(new GetUserTasksForAdminSpec(UserId, Status));
             var mappedTasks = Tasks.Select(z => new GetMyDailyTasksVM
             {
@@ -59,6 +63,7 @@ namespace SimpleCrm.Controllers
                 Title = z.Title,
                 Description = z.Description ?? string.Empty,
                 Status = z.Status.ToString(),
+                CompletedBy = z.CompletedBy != null ? (_userManager.FindByIdAsync(z.CompletedBy).Result?.Name ?? string.Empty) : string.Empty,
                 StartDate = z.StartAt.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture).ToUpper(),
                 EndDate = z.EndAt.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture).ToUpper(),
             }).ToList();
@@ -157,7 +162,7 @@ namespace SimpleCrm.Controllers
         [HttpPut]       
         public async Task<IActionResult> CompleteTask(string TaskId)
         {
-
+            var UserId = User.Claims.FirstOrDefault(z=>z.Type==ClaimTypes.NameIdentifier)!.Value;
             var task = await _unitOfWork.Repository<Tasks>().GetBYIdAsync(Guid.Parse(TaskId));
             var UserTasksCount = await _unitOfWork.Repository<Tasks>().GetCountWithSpecAsync(new BaseSpecification<Tasks>(z=>z.UserId==task.UserId&&z.StartAt.Date==DateTime.Now.Date));
             var UserCompletedTasksCount = await _unitOfWork.Repository<Tasks>().GetCountWithSpecAsync(new BaseSpecification<Tasks>(z=>z.UserId==task.UserId&&z.StartAt.Date==DateTime.Now.Date&&z.Status==StatusEnums.Completed));
@@ -186,6 +191,7 @@ namespace SimpleCrm.Controllers
                 }
                 else
                 {
+                    task.CompletedBy = UserId;
                     task.Status = StatusEnums.Completed;
                     _unitOfWork.Repository<Tasks>().Update(task);
 
