@@ -58,7 +58,7 @@ namespace SimpleCrm.Controllers
         public async Task<ActionResult> GetUserAttendance(string UserId)
         {
             ViewBag.Name = userManager.FindByIdAsync(UserId).Result?.Name ?? string.Empty;
-
+            ViewBag.userId=UserId;
             var attendances = await unitOfWork.Repository<Attendance>().
                 GetAllWithSpecAsync(new GetMonthlyAttendances(UserId));
             return View(attendances);
