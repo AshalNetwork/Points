@@ -1,6 +1,5 @@
-﻿ @* @model List<SimpleCrm.VM.GetMyDailyTasksVM> *@ 
-@{
-    ViewData["Title"] = "User Tasks";  
+﻿@{
+    ViewData["Title"] = $"{ViewBag.Name} Tasks";
 }
 <style>
     .cardCss{
@@ -22,7 +21,7 @@
         overflow: hidden;
     } 
 </style>
- <h1 class="text-center mt-5">User Tasks</h1>
+<h3 class="text-center m-5">@($"{ViewBag.Name} Tasks") </h3>
 <div class="row mb-2">
     <div class="col-md-6 col-sm-12">
         <button type="button" class="btn btn-success" aria-current="page"
@@ -133,6 +132,8 @@
                      console.log(tasks);
                 if (tasks.length > 0) {
                     tasks.forEach(task => {
+                        const completedByText = task.completedBy ? `<span class="text-dark">CompletedBy: ${task.completedBy}</span>` : '';
+
                         const taskCard = `
                         <div class="col-sm-12 col-md-3 mb-2">
                             <div class="card cardCss" style="width: 18rem;">
@@ -142,6 +143,7 @@
                                     <p class="card-text">
                                         DeadLine: ${task.endDate}
                                         <span class="text-info">${task.status}</span>
+                                        ${completedByText}                                    
                                     </p>
                                 </div>
                             </div>

@@ -12,5 +12,6 @@ namespace SimpleCrm.Models
         public DateTime EndAt { get; set; }
         public string UserId { get; set; }
         public ApplicationUser User { get; set; }
+        public string? CompletedBy { get; set; }
     }
 }

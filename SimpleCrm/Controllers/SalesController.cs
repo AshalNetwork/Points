@@ -12,7 +12,7 @@ using System.Security.Claims;
 namespace SimpleCrm.Controllers
 {
     [Authorize]
-    public class SalesController(IUnitOfWork _unitOfWork) : Controller
+    public class SalesController(IUnitOfWork _unitOfWork,UserManager<ApplicationUser> _userManager) : Controller
     {
         public async Task<IActionResult> Index()
         {
@@ -30,8 +30,9 @@ namespace SimpleCrm.Controllers
         public async Task<IActionResult> GetUserSales()
         {
             string userId = User.Claims.FirstOrDefault(z=>z.Type==ClaimTypes.NameIdentifier)!.Value;
-
+            ViewBag.Name = _userManager.FindByIdAsync(userId).Result?.Name??string.Empty;
             var sales = await _unitOfWork.Repository<Sale>().GetAllWithSpecAsync(new GetAllSalesSpec(userId));
+
             var mappedSales = sales.Select(z => new AllSalesRequestsVM
             {
                 Id = z.Id,

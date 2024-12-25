@@ -1,0 +1,44 @@
+﻿@model IEnumerable<SimpleCrm.Models.Project>
+@{
+    ViewData["Title"] = "All Projects";
+}
+<h1 class="text-center m-5">All Projects</h1>
+
+<div class="row mb-2">
+    <div class="col-md-6 col-sm-12">
+        <div class="btn-group">
+            <a class="btn btn-success" aria-current="page" asp-action="Create"><i class="bi bi-plus"></i>Create</a>
+        </div>
+    </div>
+    <div class="col-md-2 col-sm-0"></div>
+
+</div>
+<div class="row">
+
+    @foreach (var item in Model)
+    {
+        <a href="/Projects/Details?Id=@item.Id" style="color:#000">
+        <div class="col-sm-12 col-md-3 mb-2">
+            <div class="card" style="width: 18rem;">
+                <div class="card-body">
+                    <h5 class="card-title text-center"> @item.Title</h5>
+                    <p class="card-text">Project Manger: @item.ProjectManger</p>
+                    <p class="card-text">
+                        Started At: @item.StartedAt.ToString("yyyy-MM-dd")<br />Status:
+                        @if (item.Ended ==true)
+                        {
+                            <span class="text-info">Ended</span>
+                        }
+                       else
+                        {
+                            <span class="text-primary">Under Production</span>
+                        }
+
+                    </p>
+                </div>
+            </div>
+        </div>
+        </a>
+    }
+
+</div>

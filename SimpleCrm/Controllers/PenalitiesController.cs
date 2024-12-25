@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Drawing.Diagrams;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -37,12 +38,15 @@ namespace SimpleCrm.Controllers
             else
                 UserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
+            ViewBag.Name = _userManager.FindByIdAsync(UserId).Result?.Name ?? string.Empty;
+
             var penalities = await _unitOfWork.Repository<Penality>().GetAllWithSpecAsync(new GetUserPenalitiesSpec(UserId));
             var mappedPenalities = penalities.Select(z => new UserPenalitiesVM
             {
                 Id = z.Id,
                 Description = z.Description,
                 Reason = z.Reason,
+                User = z.User.Name,
                 Date = z.Date.ToString(),
             }).ToList();
             return View(mappedPenalities);

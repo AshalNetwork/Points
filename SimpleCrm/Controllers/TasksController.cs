@@ -36,6 +36,8 @@ namespace SimpleCrm.Controllers
         public async Task<IActionResult> UserTasks()
         {
             string userId = User.Claims.FirstOrDefault(z=>z.Type==ClaimTypes.NameIdentifier)!.Value;
+            ViewBag.Name = _userManager.FindByIdAsync(userId).Result?.Name ?? string.Empty;
+
             var Tasks = await _unitOfWork.Repository<Tasks>().GetAllWithSpecAsync(new GetMyDayTasksSpec(userId));
             var mappedTasks = Tasks.Select(z => new GetMyDailyTasksVM
             {
@@ -52,6 +54,8 @@ namespace SimpleCrm.Controllers
         [HttpGet]
         public async Task<IActionResult> GetUserTasksForAdmins(string UserId, StatusEnums Status = StatusEnums.UnderReview)
         {
+            ViewBag.Name = _userManager.FindByIdAsync(UserId).Result?.Name ?? string.Empty;
+
             var Tasks = await _unitOfWork.Repository<Tasks>().GetAllWithSpecAsync(new GetUserTasksForAdminSpec(UserId, Status));
             var mappedTasks = Tasks.Select(z => new GetMyDailyTasksVM
             {
@@ -59,35 +63,13 @@ namespace SimpleCrm.Controllers
                 Title = z.Title,
                 Description = z.Description ?? string.Empty,
                 Status = z.Status.ToString(),
+                CompletedBy = z.CompletedBy != null ? (_userManager.FindByIdAsync(z.CompletedBy).Result?.Name ?? string.Empty) : string.Empty,
                 StartDate = z.StartAt.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture).ToUpper(),
                 EndDate = z.EndAt.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture).ToUpper(),
             }).ToList();
             return View();
         }
-      /*  [Authorize(Roles = "ProductionMangerA,ProductionMangerB,OperationManger")]
-        public IActionResult Create()
-        {
-            var model = new CreateTaskVM
-            {
-                StartAt = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-ddTHH:mm")),
-                EndAt = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-ddTHH:mm")),
-                StatusList = Enum.GetValues(typeof(StatusEnums))
-                   .Cast<StatusEnums>()
-                   .Select(g => new SelectListItem
-                   {
-                       Value = ((int)g).ToString(),
-                       Text = g.ToString()
-                   }).ToList(),
-                UsersList = _userManager.Users.Select(g => new SelectListItem
-                {
-                    Value = g.Id.ToString(),
-                    Text = g.Name.ToString()
-                }).ToList(),
-            };
 
-            return View(model);
-        }
-*/
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateTaskVM model)
@@ -137,6 +119,26 @@ namespace SimpleCrm.Controllers
 
         }
         [HttpPut]       
+        public async Task<IActionResult> Shift(string TaskId)
+        {
+
+             var task = await _unitOfWork.Repository<Tasks>().GetBYIdAsync(Guid.Parse(TaskId));
+            try
+            {
+                task.StartAt =task.StartAt.AddDays(1);
+                _unitOfWork.Repository<Tasks>().Update(task);
+                await _unitOfWork.Complete();
+                return RedirectToAction("UserTasks", "Tasks");
+            }
+            catch (Exception ex)
+            {
+                _unitOfWork.Rollback();
+
+                return RedirectToAction("UserTasks", "Tasks");
+            }
+
+        }
+        [HttpPut]       
         public async Task<IActionResult> InProgress(string TaskId)
         {
 
@@ -160,26 +162,45 @@ namespace SimpleCrm.Controllers
         [HttpPut]       
         public async Task<IActionResult> CompleteTask(string TaskId)
         {
-
-             var task = await _unitOfWork.Repository<Tasks>().GetBYIdAsync(Guid.Parse(TaskId));
-            var UserTasks = await _unitOfWork.Repository<Tasks>().GetCountWithSpecAsync(new BaseSpecification<Tasks>(z=>z.UserId==task.UserId&&z.StartAt.Date==DateTime.Now.Date));
-            var Taskpoint = 170.0m / UserTasks;
+            var UserId = User.Claims.FirstOrDefault(z=>z.Type==ClaimTypes.NameIdentifier)!.Value;
+            var task = await _unitOfWork.Repository<Tasks>().GetBYIdAsync(Guid.Parse(TaskId));
+            var UserTasksCount = await _unitOfWork.Repository<Tasks>().GetCountWithSpecAsync(new BaseSpecification<Tasks>(z=>z.UserId==task.UserId&&z.StartAt.Date==DateTime.Now.Date));
+            var UserCompletedTasksCount = await _unitOfWork.Repository<Tasks>().GetCountWithSpecAsync(new BaseSpecification<Tasks>(z=>z.UserId==task.UserId&&z.StartAt.Date==DateTime.Now.Date&&z.Status==StatusEnums.Completed));
+            var Taskpoint = 170.0m / UserTasksCount;
+            var CompletedTaskspoint = Taskpoint * ++UserCompletedTasksCount;
+            var TodayPointsRecord = await _unitOfWork.Repository<UserPoint>().GetCountWithSpecAsync(new BaseSpecification<UserPoint>(z => z.UserId == task.UserId && z.DateTime.Date == DateTime.Now.Date&&z.PointType==PointsTypeEnum.Production));
+           
             try
             {
-                task.Status = StatusEnums.Completed;
-                _unitOfWork.Repository<Tasks>().Update(task);
-                var userPoint = new UserPoint
-                {
-                    DateTime = DateTime.Now,
-                    UserId = task.UserId,
-                    TaskId = task.Id,
-                    value = Taskpoint,
-                    PointType = PointsTypeEnum.Production,
-                };
-                await _unitOfWork.Repository<UserPoint>().Add(userPoint);
 
-                await _unitOfWork.Complete();
-                return RedirectToAction("UserTasks", "Tasks");
+                if (TodayPointsRecord == 0)
+                {
+                    task.Status = StatusEnums.Completed;
+                    _unitOfWork.Repository<Tasks>().Update(task);
+                    var userPoint = new UserPoint
+                    {
+                        DateTime = DateTime.Now,
+                        UserId = task.UserId,
+                        value = CompletedTaskspoint,
+                        PointType = PointsTypeEnum.Production,
+                    };
+                    await _unitOfWork.Repository<UserPoint>().Add(userPoint);
+
+                    await _unitOfWork.Complete();
+                    return RedirectToAction("UserTasks", "Tasks");
+                }
+                else
+                {
+                    task.CompletedBy = UserId;
+                    task.Status = StatusEnums.Completed;
+                    _unitOfWork.Repository<Tasks>().Update(task);
+
+                    var ExistedPoint = await _unitOfWork.Repository<UserPoint>().GetEntityWithSpecAsync(new BaseSpecification<UserPoint>(z => z.UserId == task.UserId && z.DateTime.Date == DateTime.Now.Date && z.PointType == PointsTypeEnum.Production));
+                    ExistedPoint.value = CompletedTaskspoint;
+                    _unitOfWork.Repository<UserPoint>().Update(ExistedPoint);
+                    await _unitOfWork.Complete();
+                    return RedirectToAction("UserTasks", "Tasks");
+                }
             }
             catch (Exception ex)
             {
@@ -200,8 +221,8 @@ namespace SimpleCrm.Controllers
             }
             try
             {
-                var userpoints = await _unitOfWork.Repository<UserPoint>().GetAllWithSpecAsync(new BaseSpecification<UserPoint>(z=>z.TaskId==Guid.Parse(Id)));
-                _unitOfWork.Repository<UserPoint>().DeleteRange(userpoints.ToList());
+                //var userpoints = await _unitOfWork.Repository<UserPoint>().GetAllWithSpecAsync(new BaseSpecification<UserPoint>(z=>z.TaskId==Guid.Parse(Id)));
+               // _unitOfWork.Repository<UserPoint>().DeleteRange(userpoints.ToList());
                 _unitOfWork.Repository<Tasks>().Delete(task);
                 await _unitOfWork.Complete();
                 return RedirectToAction("Index", "Tasks");

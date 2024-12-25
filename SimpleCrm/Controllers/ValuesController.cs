@@ -7,12 +7,13 @@ using System.Globalization;
 using System.Security.Claims;
 using SimpleCrm.Models;
 using SimpleCrm.Enums;
+using Microsoft.AspNetCore.Identity;
 
 namespace SimpleCrm.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ValuesController(IUnitOfWork _unitOfWork) : ControllerBase
+    public class ValuesController(IUnitOfWork _unitOfWork,UserManager<ApplicationUser> _userManager) : ControllerBase
     {
         [HttpGet("s")]
         public async Task<IActionResult> Get()
@@ -39,6 +40,7 @@ namespace SimpleCrm.Controllers
                     Title = z.Title,
                     Description = z.Description ?? string.Empty,
                     Status = z.Status.ToString(),
+                    CompletedBy = z.CompletedBy != null ? (_userManager.FindByIdAsync(z.CompletedBy).Result?.Name ?? string.Empty) : string.Empty,
                     StartDate = z.StartAt.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture).ToUpper(),
                     EndDate = z.EndAt.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture).ToUpper(),
                 }).ToList();

@@ -4,17 +4,17 @@
 @inject UserManager<ApplicationUser> UserManager
 @{
     var userId = Context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-    ViewData["Title"] = "Attendance";
+    var userRole =User.Claims.FirstOrDefault(z=>z.Type==ClaimTypes.Role)!.Value;
+    ViewData["Title"] = $"{ViewBag.Name} Attendance";
 }
-<h1 class="text-center">User Attendance</h1>
-@{
-    var s = Model;
-}@* 
-<a class="btn btn-success text-dark" href="/Attendances/ExportExcelSheet?UserId=@Model.FirstOrDefault()?.ApplicationUserId"><i class="bi bi-file-spreadsheet"></i> Export Attendance</a>
- *@
-@if (Model.Where(z => z.Date.Date == DateTime.Now.Date).Count() == 0)
+<h3 class="text-center m-5">@($"{ViewBag.Name} Attendance") </h3>
+@if (userRole != "Employee")
 {
+<button class="btn btn-success text-dark" id="processAttendanceBtn"><i class="bi bi-file-spreadsheet"></i> Export Attendance</button>
+}
+@if (ViewBag.userId==userId){
+    @if (Model.Where(z => z.Date.Date == DateTime.Now.Date).Count() == 0)
+    {
     <form asp-controller="Attendances" asp-action="Index" method="post" class="w-75 m-auto">
         @Html.AntiForgeryToken()
         <div class="form-group">
@@ -24,19 +24,23 @@
         <button type="submit" class="btn btn-primary mt-1">Exist</button>
     </form>
 
-}
-else if (Model.Where(z => z.Date.Date == DateTime.Now.Date && z.CheckOut == TimeSpan.Zero).Count() > 0)
-{
-    <form asp-controller="Attendances" asp-action="Index" method="post" class="w-75 m-auto">
-        @Html.AntiForgeryToken()
-        <div class="form-group">
-            <input type="hidden" name="UserId" value="@userId" />
-        </div>
+    }
+    else if (Model.Where(z => z.Date.Date == DateTime.Now.Date && z.CheckOut == TimeSpan.Zero).Count() > 0)
+    {
+        if(DateTime.Now.Hour>14)
+        {
+        <form asp-controller="Attendances" asp-action="Index" method="post" class="w-75 m-auto">
+            @Html.AntiForgeryToken()
+            <div class="form-group">
+                <input type="hidden" name="UserId" value="@userId" />
+            </div>
 
-        <button type="submit" class="btn btn-primary mt-1">Leave</button>
-    </form>
+            <button type="submit" class="btn btn-primary mt-1">Leave</button>
+        </form>
+        }
+    }
 }
-<table class="text-center table table-bordered table-hover table-responsive">
+<table id="attendanceTable" class="text-center table table-bordered table-hover table-responsive">
     <thead class=" bg-black text-white">
         <tr>
             <th scope="col">Date</th>
@@ -49,18 +53,67 @@ else if (Model.Where(z => z.Date.Date == DateTime.Now.Date && z.CheckOut == Time
     <tbody>
         @foreach (var task in Model)
         {
+            
             <tr>
                 <td>@task.Date.Day - @task.Date.Month - @task.Date.Year </td>
                 <td>@task.CheckIn.Hours : @task.CheckIn.Minutes</td>
                 <td>@task.CheckOut.Hours : @task.CheckOut.Minutes</td>
                 <td>
                     @{
-                        var egyptTime = new TimeSpan(9, 0, 0);
-                        var lat = @task.CheckIn - @egyptTime;
+                        var user = await UserManager.FindByIdAsync(task.ApplicationUserId);
+                        var egyptTime = new TimeSpan();
+                        TimeSpan late = new TimeSpan();
+
+                        if (user.Email.ToLower() == "sy034692@gmail.com")
+                        {
+                            egyptTime = new TimeSpan(13, 0, 0);
+                            if (task.CheckIn > new TimeSpan(13, 0, 0))
+                                late = task.CheckIn - egyptTime;
+                        }
+                        else
+                        {
+                            egyptTime = new TimeSpan(9, 0, 0);
+                            if (task.CheckIn > new TimeSpan(9, 0, 0))
+                                late = task.CheckIn - egyptTime;
+                        }
                     }
-                    @lat.Hours : @lat.Minutes : @lat.Seconds
+                    @late.Hours: @late.Minutes : @late.Seconds
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+@section Scripts{
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+ <script>
+        $(document).ready(function () {
+            $("#processAttendanceBtn").click(function () {
+                // Prepare the table data for export
+                const attendanceList = [];
+                $("#attendanceTable tbody tr").each(function () {
+                    const row = {
+                        Date: $(this).find("td:nth-child(1)").text(),
+                        CheckIn: $(this).find("td:nth-child(2)").text(),
+                        Checkout: $(this).find("td:nth-child(3)").text(),
+                        Late: $(this).find("td:nth-child(4)").text(),
+                    };
+                    attendanceList.push(row);
+                });
+
+                const workbook = XLSX.utils.book_new();
+                const worksheet = XLSX.utils.json_to_sheet(attendanceList.reverse(), { origin: "A2" }); 
+
+                // Add a title row spanning 4 columns
+                worksheet["A1"] = { v: "Attendance Report", t: "s" }; 
+                worksheet["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }]; // Merge A1:D1
+
+                // Append the worksheet to the workbook
+                XLSX.utils.book_append_sheet(workbook, worksheet, "Attendance");
+
+                // Generate the Excel file and trigger download
+                XLSX.writeFile(workbook, "Attendance.xlsx");
+            });
+        });
+    </script>
+}

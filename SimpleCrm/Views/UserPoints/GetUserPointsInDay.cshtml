@@ -3,10 +3,10 @@
 
 @model IEnumerable<SimpleCrm.VM.DetailedPointVM>
 @{
-    ViewData["Title"] = "Points";
+    ViewData["Title"] = $"{ViewBag.Name} Points";
 }
 <div>
-    <h1 class="text-center">All User Points</h1>
+    <h3 class="text-center m-5">@($"{ViewBag.Name} Points") </h3>
 
     <div class="row">
          @if (User.Identity.IsAuthenticated)
@@ -31,7 +31,7 @@
     <table class="table table-bordered table-hover table-responsive text-center">
         <thead class="text-center bg-black text-white">
             <tr>
-                <th scope="col">Production/1020</th>
+                <th scope="col">Production/170</th>
                 <th scope="col">Behavior/20</th>
                 <th scope="col">Lateness/10</th>
                 <th scope="col">Total/200</th>
@@ -132,6 +132,7 @@
                         <label class="control-label">Type</label>
                         <select name="PointType" id="reasonDropdown" class="form-control" data-val="true" data-val-required="The Type Is Required" required>
                             <option value="">--Type--</option>
+                            <option value="1">Production</option>
                             <option value="2">Behavior</option>
                             <option value="3">Lateness</option>
                             <option value="4">Custom</option>

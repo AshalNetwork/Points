@@ -3,7 +3,7 @@
     ViewData["Title"] = "Tasks";
 }
 <div>
-    <h1 class="text-center">All Tasks</h1>
+    <h1 class="text-center m-5">All Tasks</h1>
 
     <table class="table table-bordered table-hover table-responsive">
         <thead class="text-center bg-black text-white">
@@ -29,10 +29,14 @@
                     <td>@task.EndDate</td>
 
                     <td>
-                        
-                       @*   <button onclick="deleteTask('@task.Id')" class="btn btn-outline-danger" type="button"><i class="bi bi-trash"></i> Delete</button>
-                          *@
-                            <button onclick="CompleteTask('@task.Id')" class="btn btn-outline-success" type="button"><i class="bi bi-check-circle"></i> Complete</button>                        
+                        @if (task.Status == "UnderReview")
+                        {
+                            <button onclick="CompleteTask('@task.Id')" class="btn btn-outline-success" type="button"><i class="bi bi-check-circle"></i> Complete</button>
+                        }
+                        @if (task.Status == "InProgress" || task.Status == "Pending")
+                        {
+                            <button onclick="ShiftTask('@task.Id')" class="btn btn-outline-primary" type="button"><i class="bi bi-trash"></i> Shift</button>
+                        }
                     </td>
 
                 </tr>

@@ -23,6 +23,8 @@ namespace SimpleCrm.Controllers
         public async Task<IActionResult> GetUserPointsInDay(string UserId)
         {
             var user =await  _userManager.FindByIdAsync(UserId);
+            ViewBag.Name = user?.Name ?? string.Empty;
+
             if (user == null)
             {
                 return NotFound();
@@ -51,24 +53,38 @@ namespace SimpleCrm.Controllers
         //[ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(AddUserPointDto dto)
         {
+            var TodayPointsRecord = await _unitOfWork.Repository<UserPoint>().GetCountWithSpecAsync(new BaseSpecification<UserPoint>(z => z.UserId == dto.UserId && z.DateTime.Date == DateTime.Now.Date && z.PointType == (PointsTypeEnum)dto.PointType));
 
-            var point = new UserPoint
-            {
-                DateTime = DateTime.Now,
-                value = dto.Value,
-                PointType = (PointsTypeEnum)dto.PointType,
-                UserId = dto.UserId,
-            };
+            
             try
             {
-                await _unitOfWork.Repository<UserPoint>().Add(point);
-                await _unitOfWork.Complete();
-                return RedirectToAction("Index", "Home");
+                if (TodayPointsRecord == 0)
+                {
+                    var point = new UserPoint
+                    {
+                        DateTime = DateTime.Now,
+                        value = dto.Value,
+                        PointType = (PointsTypeEnum)dto.PointType,
+                        UserId = dto.UserId,
+                    };
+                    await _unitOfWork.Repository<UserPoint>().Add(point);
+                    await _unitOfWork.Complete();
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    var ExistedRecord = await _unitOfWork.Repository<UserPoint>().GetEntityWithSpecAsync(new BaseSpecification<UserPoint>(z => z.UserId == dto.UserId && z.DateTime.Date == DateTime.Now.Date && z.PointType == (PointsTypeEnum)dto.PointType));
+                    ExistedRecord.value += dto.Value;
+                    _unitOfWork.Repository<UserPoint>().Update(ExistedRecord);
+                    await _unitOfWork.Complete();
+                    return RedirectToAction("Index", "Home");
+                }
+
             }
             catch (Exception ex)
             {
                 _unitOfWork.Rollback();
-                return View(point);
+                return View();
             }
         }
     }

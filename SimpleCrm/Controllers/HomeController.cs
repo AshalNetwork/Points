@@ -1,3 +1,4 @@
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -18,6 +19,8 @@ namespace SimpleCrm.Controllers
         public async Task<ActionResult> Index()
         {
             var user = await _userManager.FindByIdAsync(User.Claims.FirstOrDefault(e=>e.Type==ClaimTypes.NameIdentifier)!.Value);
+            ViewBag.Name = user?.Name ?? string.Empty;
+
             var attendances = await _unitOfWork.Repository<Attendance>().
                 GetAllWithSpecAsync(new GetMonthlyAttendances(user.Id));
             return View(attendances);
