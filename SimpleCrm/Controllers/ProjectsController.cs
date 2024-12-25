@@ -86,7 +86,7 @@ namespace SimpleCrm.Controllers
             return View(project);
         }
 
-        [HttpPut]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Guid Id,Project model)
         {

@@ -9,6 +9,7 @@
     <form asp-action="Edit" method="post" autocomplete="off">
         @Html.AntiForgeryToken()
         <input asp-for="Id" class="form-control" hidden/>
+        <input asp-for="Ended" class="form-control" hidden/>
         <div class="form-group">
             <label asp-for="Title" class="control-label"></label>
             <input asp-for="Title" class="form-control" />
@@ -39,7 +40,7 @@
         </div>
     </form>
     <div class="ml-2">
-        <a asp-action="Index" asp-controller="Home">Back to Home</a>
+        <a asp-action="Index" asp-controller="Projects">Back to Home</a>
     </div>
 </div>
 
@@ -56,27 +57,5 @@
     ClassicEditor.create(document.querySelector('#objectives'), {
         toolbar: ['bold', 'italic', 'underline', 'bulletedList', 'numberedList', 'blockQuote'],
         language: 'en' // Arabic language support
-    });
-</script>ipt>
-    document.addEventListener('DOMContentLoaded', function () {
-
-        const reasonDropdown = document.getElementById('reasonDropdown');
-        const customReasonInput = document.getElementById('customReasonInput');
-        const selectedText = reasonDropdown.options[reasonDropdown.selectedIndex].text;
-
-        if (selectedText === 'Custom') {
-            customReasonInput.style.display = 'block'; // Show input field
-        } else {
-            customReasonInput.style.display = 'none'; // Hide input field
-        }
-        reasonDropdown.addEventListener('change', function () {
-            const selectedText = reasonDropdown.options[reasonDropdown.selectedIndex].text;
-
-            if (selectedText === 'Custom') {
-                customReasonInput.style.display = 'block'; // Show input field
-            } else {
-                customReasonInput.style.display = 'none'; // Hide input field
-            }
-        });
     });
 </script>
