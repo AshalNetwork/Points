@@ -45,6 +45,7 @@
                                 @if (!User.IsInRole("Employee"))
                                 {
                                     <li class="nav-item">
+
                                         <a class="nav-link text-dark" asp-area="" asp-controller="Tasks" asp-action="Index">Tasks</a>
                                     </li>
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">Users</a>
@@ -66,8 +67,10 @@
                             @if (User.Identity.IsAuthenticated)
                             {
                                     <li class="nav-item">
-                                        <a class="nav-link text-dark" asp-area="" asp-controller="Tasks" asp-action="UserTasks"> <i class="bi bi-list-task"></i> My Tasks</a>
-                                    </li>
+                                        <a href="\Tasks\UserTasks?UserId=@userId" class="nav-link text-dark"><i class="bi bi-list-task"></i> My Tasks</a>
+
+@*                                         <a class="nav-link text-dark" asp-area="" asp-controller="Tasks" asp-action="UserTasks"> <i class="bi bi-list-task"></i> My Tasks</a>
+ *@                                    </li>
                                     <li class="nav-item">
                                         <a class="nav-link text-dark" asp-area="" asp-controller="Reports" asp-action="UserReports"> <i class="bi bi-chat-left-dots-fill"></i> My Reports</a>
                                     </li>

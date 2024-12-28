@@ -222,12 +222,12 @@ function ShiftTask(taskId) {
     });
 }
 /*******************************MAde The Task Under Review ******************************************** */
-function UnderReview(taskId) {
+function UnderReview(taskId,userId) {
     $.ajax({
         url: '/Tasks/UnderReview?TaskId=' + taskId,
         type: 'PUT',
         success: function () {
-            refreshTable('/Tasks/UserTasks');
+            refreshTable('/Tasks/UserTasks',userId);
             toastr.success('Task has been marked as Under Review.', 'Success');
         },
         error: function () {
@@ -236,12 +236,12 @@ function UnderReview(taskId) {
     });
 }
 /*******************************MAde The Task InProgress ******************************************** */
-function InProgressTask(taskId) {
+function InProgressTask(taskId,userId) {
     $.ajax({
         url: '/Tasks/InProgress?TaskId=' + taskId,
         type: 'PUT',
         success: function () {
-            refreshTable('/Tasks/UserTasks');
+            refreshTable('/Tasks/UserTasks', userId);
             toastr.success('Task has been marked as InProgress.', 'Success');
         },
         error: function () {

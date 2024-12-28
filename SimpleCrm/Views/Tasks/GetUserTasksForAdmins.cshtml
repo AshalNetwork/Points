@@ -121,7 +121,7 @@
         });
          function GetTasks(userId,selectedStatus) {
                 $.ajax({
-                url: `/api/Values/Sdf?UserId=${userId}&Status=${selectedStatus}`,
+                url: `/api/Values/GetUserTasksForAdmins?UserId=${userId}&Status=${selectedStatus}`,
                 type: 'get',
                  success: function (data) {
                 // Check if `data` needs parsing or has a specific property

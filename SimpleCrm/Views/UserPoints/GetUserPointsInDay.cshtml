@@ -1,110 +1,132 @@
-﻿@using System.Security.Claims
+﻿ @model UserPointsViewModel
+ @using System.Security.Claims
 @using Microsoft.AspNetCore.Identity
+<h3 class="text-center m-5">@($"{ViewBag.Name} Current Week Points") </h3>
 
-@model IEnumerable<SimpleCrm.VM.DetailedPointVM>
-@{
-    ViewData["Title"] = $"{ViewBag.Name} Points";
-}
-<div>
-    <h3 class="text-center m-5">@($"{ViewBag.Name} Points") </h3>
-
-    <div class="row">
-         @if (User.Identity.IsAuthenticated)
+<div class="row">
+    @if (User.Identity.IsAuthenticated)
+    {
+        @if (!User.IsInRole("Employee"))
         {
-            @if (!User.IsInRole("Employee"))
-            {
-                <div class="col-md-6 col-sm-12">
-                    <button type="button" class="btn btn-success" aria-current="page"
-                    data-bs-toggle="modal"
-                    data-bs-target="#exampleModal">
-                        <i class="bi bi-plus"></i> Add Point
-                    </button>
-                </div>
-            }
-
+            <div class="col-md-6 col-sm-12">
+                <button type="button" class="btn btn-success" aria-current="page"
+                        data-bs-toggle="modal"
+                        data-bs-target="#exampleModal">
+                    <i class="bi bi-plus"></i> Add Point
+                </button>
+            </div>
         }
-        <div class="col-md-6 col-sm-12 weekPoints">
-        </div>
-        
+
+    }
+    <div class="col-md-6 col-sm-12 weekPoints">
     </div>
 
-    <table class="table table-bordered table-hover table-responsive text-center">
-        <thead class="text-center bg-black text-white">
-            <tr>
-                <th scope="col">Production/170</th>
-                <th scope="col">Behavior/20</th>
-                <th scope="col">Lateness/10</th>
-                <th scope="col">Total/200</th>
-                <th scope="col">Preject</th>                
-                <th scope="col">Date</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var task in Model)
+</div>
+<table class="ThisWeekPoints table table-bordered">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th scope="col">Production/170</th>
+            <th scope="col">Behavior/20</th>
+            <th scope="col">Lateness/10</th>
+            <th scope="col">Total/200</th>  
+            <th>Custom</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.CurrentWeekPoints.Any())
+        {
+            foreach (var point in Model.CurrentWeekPoints)
             {
-                <tr class="client-row">
-                    <td>@task.Production</td>
-                    @if (task.Behavior < 12)
+                <tr>
+                    <td>@point.Date</td>
+                    <td>@point.Production</td>
+                    @if (point.Behavior < 12)
                     {
-                        <td class="bg-danger bg-opacity-75 text-white">@task.Behavior</td>
+                        <td class="bg-danger bg-opacity-75 text-white">@point.Behavior</td>
                     }
                     else
                     {
-                        <td>@task.Behavior</td>
+                        <td>@point.Behavior</td>
                     }
-                    @if (task.Lateness < 6)
+                    @if (point.Lateness < 6)
                     {
-                        <td class="bg-danger bg-opacity-75 text-white">@task.Lateness</td>
+                        <td class="bg-danger bg-opacity-75 text-white">@point.Lateness</td>
                     }
                     else
                     {
-                        <td>@task.Lateness</td>
+                        <td>@point.Lateness</td>
                     }
-                    @if ((task.Production + task.Behavior + task.Lateness)<188)
+                    @if ((point.Production + point.Behavior + point.Lateness) < 188)
                     {
-                        <td class="bg-danger bg-opacity-75 text-white">@(task.Production + task.Behavior + task.Lateness)</td>
+                        <td class="bg-danger bg-opacity-75 text-white">@(point.Production + point.Behavior + point.Lateness)</td>
                     }
                     else
                     {
-                        <td>@(task.Production + task.Behavior + task.Lateness)</td>
+                        <td>@(point.Production + point.Behavior + point.Lateness)</td>
                     }
-                    <td>@task.Preject</td>                    
-                    <td>@task.Date</td>
+                    <td>@point.Preject</td>
                 </tr>
-            }
-            <tr>
-                <td>@Model.Sum(z=>z.Production)</td>
-                <td>@Model.Sum(z=>z.Behavior)</td>
-                <td>@Model.Sum(z=>z.Lateness)</td>
-                @if (Model.Sum(z => z.Production + z.Behavior + z.Lateness)<1128)
+                @if (Model.CurrentWeekPoints.Sum(z => z.Production + z.Behavior + z.Lateness + z.Preject) < 1128)
                 {
-                    <td class="bg-danger bg-opacity-75 text-white">@Model.Sum(z => z.Production + z.Behavior + z.Lateness)</td>
+                    <tr class="bg-danger bg-opacity-75 text-white">
+                        <td colspan="3" class="fw-bolder">Week Points</td>
+                        <td colspan="3" class="fw-bolder">@Model.CurrentWeekPoints.Sum(z => z.Production + z.Behavior + z.Lateness + z.Preject)</td>
+                    </tr>
                 }
                 else
                 {
-                    <td>@Model.Sum(z => z.Production + z.Behavior + z.Lateness)</td>
+                    <tr>
+                        <td colspan="3" class="fw-bolder">Week Points</td>
+                        <td colspan="3" class="fw-bolder">@Model.CurrentWeekPoints.Sum(z => z.Production + z.Behavior + z.Lateness + z.Preject)</td>
+                    </tr>
                 }
-                <td>@Model.Sum(z => z.Preject)</td>
-            </tr>
-            @if(Model.Sum(z => z.Production + z.Behavior + z.Lateness + z.Preject)<1128)
-            {
-                <tr class="bg-danger bg-opacity-75 text-white">
-                    <td colspan="3" class="fw-bolder">Week Points</td>
-                    <td colspan="3" class="fw-bolder">@Model.Sum(z => z.Production + z.Behavior + z.Lateness + z.Preject)</td>                                
-                </tr>
             }
-            else
+        }
+        else
+        {
+            <tr>
+                <td colspan="5" class="text-center">No data available for the current week.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h3 class="text-center m-5">Previous Weeks Summary</h3>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Week Number</th>
+            <th>Total Production</th>
+            <th>Total Behavior</th>
+            <th>Total Lateness</th>
+            <th>Total Points</th>
+            <th>Total Custom</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.PreviousWeeksSummary.Any())
+        {
+            foreach (var week in Model.PreviousWeeksSummary)
             {
                 <tr>
-                    <td colspan="3" class="fw-bolder">Week Points</td>
-                    <td colspan="3" class="fw-bolder">@Model.Sum(z => z.Production + z.Behavior + z.Lateness + z.Preject)</td>
+                    <td>@week.WeekNumber</td>
+                    <td>@week.TotalProduction</td>
+                    <td>@week.TotalBehavior</td>
+                    <td>@week.TotalLateness</td>
+                    <td>@(week.TotalProduction + week.TotalBehavior + week.TotalLateness)</td>
+                    <td>@week.TotalPreject</td>
                 </tr>
             }
-        </tbody>
-    </table>
-
-</div>
-
+        }
+        else
+        {
+            <tr>
+                <td colspan="6" class="text-center">No data available for previous weeks.</td>
+            </tr>
+        }
+    </tbody>
+</table>
 
 <!-- PoP Up-->
 
@@ -195,14 +217,27 @@
                         $('#exampleModal').modal('hide');
                         $('#authorizationForm')[0].reset();
                         toastr.success('The Point Has Saved Successfully', { timeOut: 5000 })
-                        refreshTable('/UserPoints/GetUserPointsInDay',userId);
+                        refreshPointsTable(userId);
                     },
                     error: function (xhr, status, error) {
                         toastr.error('An Error Occured While Saving The Point', { timeOut: 5000 })
                     }
                 });
             });
-            
+            function refreshPointsTable(UserId) {
+                $.ajax({
+                    url: "/UserPoints/GetUserPointsInDay?UserId=" + UserId,
+                    type: 'GET',
+                    success: function (result) {
+                        $('.ThisWeekPoints tbody').html($(result).find('.ThisWeekPoints tbody').html());
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Failed to refresh the table: ", error);
+                        alert("An error occurred while refreshing the table.");
+                    }
+                });
+            }
         });
+       
     </script>
 }

@@ -3,35 +3,98 @@
     ViewData["Title"] = $"{ViewBag.Name} Tasks";
 }
 <h3 class="text-center m-5">@($"{ViewBag.Name} Tasks") </h3>
-<div class="row">
-@foreach (var item in Model)
-{
-      <div class="col-sm-12 col-md-3 mb-2">
-        <div class="card" style="width: 18rem;">
-            <div class="card-body">
-                <p class="d-none">@item.Id</p>
-                <h5 class="card-title text-center"> @item.Title</h5>
-                <p class="card-text">@item.Description</p>
-                <p class="card-text">DeadLine: @item.EndDate
-
-                    @if (item.Status == "Pending")
-                    {
-                        <span class="text-info"> @item.Status</span>
-                    }
-                    @if (item.Status == "InProgress")
-                    {
-                        <span class="text-primary"> @item.Status</span>
-                    }
-
-                </p>
-                    <button onclick="UnderReview('@item.Id')" class="btn btn-success" type="button"><i class="bi bi-check-circle"></i> Completed</button>
-                    @if (item.Status != "InProgress")
-                    {
-                        <button onclick="InProgressTask('@item.Id')" class="btn btn-primary" type="button"><i class="bi bi-gear"></i> InProgress</button>
-                    }
-                </div>
-        </div>
-      </div>
-}
-
+<div class="col-md-6 col-sm-12">
+    <select id="statusFilter" class="form-select" style="width: 200px; margin: 0 auto;">
+        <option value="1" selected>Pending</option>
+        <option value="2">In Progress</option>
+        <option value="3">Under Review</option>
+        <option value="4">Completed</option>
+    </select>
 </div>
+<div class="row" id="tasksContainer">
+</div>
+
+
+@section Scripts {
+    <script>
+
+        $(document).ready(function () {
+            const selectedStatus = $(this).val();
+            const urlParams = new URLSearchParams(window.location.search);
+            const userId = urlParams.get('UserId');
+            GetTasks(userId, 1);
+            // Handle change event on the dropdown
+            $('#statusFilter').on('change', function () {
+                const selectedStatus = $(this).val();
+                const urlParams = new URLSearchParams(window.location.search);
+                const userId = urlParams.get('UserId');
+                GetTasks(userId, selectedStatus);
+
+            });
+
+        });
+        function GetTasks(userId, selectedStatus) {
+            $.ajax({
+                url: `/api/Values/UserTasks?UserId=${userId}&Status=${selectedStatus}`,
+                type: 'get',
+                success: function (data) {
+                    // Check if `data` needs parsing or has a specific property
+                    let tasks = Array.isArray(data) ? data : JSON.parse(data);
+
+                    const tasksContainer = $('#tasksContainer');
+                    tasksContainer.empty();
+                    console.log(tasks);
+                    if (tasks.length > 0) {
+                        tasks.forEach(task => {
+                            // Determine the button based on the status
+                            let actionButton = '';
+                            if (task.status === 'Pending') {
+                                actionButton = `<button class="btn btn-success btn-sm inProgress-task" data-id="${task.id}" data-user-Id="${userId}"><i class="bi bi-gear"></i> In Progress</button>`;
+                            } else if (task.status === 'InProgress') {
+                                actionButton = `<button class="btn btn-warning btn-sm complete-task" data-id="${task.id}" data-user-Id="${userId}"><i class="bi bi-check-circle"></i> Complete</button>`;
+                            }
+                            const taskCard = `
+                                <div class="col-sm-12 col-md-3 mb-2">
+                                    <div class="card cardCss" style="width: 18rem;">
+                                        <div class="card-body">
+                                            <h5 class="card-title text-center">${task.title}</h5>
+                                            <p class="card-text desc">${task.description}</p>
+                                            <p class="card-text">
+                                                DeadLine: ${task.endDate}
+                                                <span class="text-info">${task.status}</span>
+                                            </p>
+                                            <div class="text-center">
+                                                ${actionButton}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                            tasksContainer.append(taskCard);
+                        });
+                        attachButtonHandlers();
+                    } else {
+                        tasksContainer.html('<p class="text-center alert alert-success">No tasks found.</p>');
+                    }
+                },
+                error: function () {
+                    toastr.error('Failed to update task. Please try again.', 'Error');
+                }
+            });
+        }
+        function attachButtonHandlers() {
+            $('.complete-task').on('click', function () {
+                const taskId = $(this).data('id');
+                const userId = $(this).data('user-Id');
+                UnderReview(taskId, userId);
+            });
+
+            $('.inProgress-task').on('click', function () {
+                const taskId = $(this).data('id');
+                const userId = $(this).data('user-Id');
+
+                InProgressTask(taskId,userId);
+            });
+        }
+    </script>
+}

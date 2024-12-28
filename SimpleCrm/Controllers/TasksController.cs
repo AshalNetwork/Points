@@ -33,12 +33,11 @@ namespace SimpleCrm.Controllers
             }).ToList();
             return View(mappedTasks);
         }
-        public async Task<IActionResult> UserTasks()
+        public async Task<IActionResult> UserTasks(string UserId)
         {
-            string userId = User.Claims.FirstOrDefault(z=>z.Type==ClaimTypes.NameIdentifier)!.Value;
-            ViewBag.Name = _userManager.FindByIdAsync(userId).Result?.Name ?? string.Empty;
+            ViewBag.Name = _userManager.FindByIdAsync(UserId).Result?.Name ?? string.Empty;
 
-            var Tasks = await _unitOfWork.Repository<Tasks>().GetAllWithSpecAsync(new GetMyDayTasksSpec(userId));
+            var Tasks = await _unitOfWork.Repository<Tasks>().GetAllWithSpecAsync(new GetMyDayTasksSpec(UserId, StatusEnums.Pending));
             var mappedTasks = Tasks.Select(z => new GetMyDailyTasksVM
             {
                 Id = z.Id,
