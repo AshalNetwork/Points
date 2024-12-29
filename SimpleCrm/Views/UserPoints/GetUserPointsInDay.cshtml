@@ -67,20 +67,21 @@
                     }
                     <td>@point.Preject</td>
                 </tr>
-                @if (Model.CurrentWeekPoints.Sum(z => z.Production + z.Behavior + z.Lateness + z.Preject) < 1128)
-                {
-                    <tr class="bg-danger bg-opacity-75 text-white">
-                        <td colspan="3" class="fw-bolder">Week Points</td>
-                        <td colspan="3" class="fw-bolder">@Model.CurrentWeekPoints.Sum(z => z.Production + z.Behavior + z.Lateness + z.Preject)</td>
-                    </tr>
-                }
-                else
-                {
-                    <tr>
-                        <td colspan="3" class="fw-bolder">Week Points</td>
-                        <td colspan="3" class="fw-bolder">@Model.CurrentWeekPoints.Sum(z => z.Production + z.Behavior + z.Lateness + z.Preject)</td>
-                    </tr>
-                }
+                
+            }
+            @if (Model.CurrentWeekPoints.Sum(z => z.Production + z.Behavior + z.Lateness + z.Preject) < 1128)
+            {
+                <tr class="bg-danger bg-opacity-75 text-white">
+                    <td colspan="3" class="fw-bolder">Week Points</td>
+                    <td colspan="3" class="fw-bolder">@Model.CurrentWeekPoints.Sum(z => z.Production + z.Behavior + z.Lateness + z.Preject)</td>
+                </tr>
+            }
+            else
+            {
+                <tr>
+                    <td colspan="3" class="fw-bolder">Week Points</td>
+                    <td colspan="3" class="fw-bolder">@Model.CurrentWeekPoints.Sum(z => z.Production + z.Behavior + z.Lateness + z.Preject)</td>
+                </tr>
             }
         }
         else
