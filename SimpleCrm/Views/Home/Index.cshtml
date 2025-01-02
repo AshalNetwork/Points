@@ -55,9 +55,16 @@
         @foreach (var task in Model)
         {
             <tr>
-                <td>@task.Date.Day - @task.Date.Month - @task.Date.Year </td>
-                <td>@task.CheckIn.Hours : @task.CheckIn.Minutes</td>
-                <td>@task.CheckOut.Hours : @task.CheckOut.Minutes</td>
+                <td>@task.Date.Day.ToString("D2") - @task.Date.Month.ToString("D2") - @task.Date.Year </td>
+                <td>@task.CheckIn.Hours.ToString("D2") : @task.CheckIn.Minutes.ToString("D2")</td>
+                <td>
+                @(
+                    (task.CheckOut.Hours > 12
+                    ? (task.CheckOut.Hours - 12).ToString("D2")
+                    : (task.CheckOut.Hours == 0 ? "00" : task.CheckOut.Hours.ToString("D2"))
+                    ) + ":" + task.CheckOut.Minutes.ToString("D2")
+                    )
+                </td>
                 <td>
                     @{
                         var user = await UserManager.FindByIdAsync(task.ApplicationUserId);
@@ -77,7 +84,7 @@
                                 late = task.CheckIn - egyptTime;
                         }
                     }
-                    @late.Hours : @late.Minutes : @late.Seconds
+                    @late.Hours.ToString("D2") : @late.Minutes.ToString("D2") : @late.Seconds.ToString("D2")
                 </td>
             </tr>
         }
