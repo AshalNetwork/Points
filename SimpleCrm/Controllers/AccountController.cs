@@ -42,12 +42,12 @@ namespace SimpleCrm.Controllers
         {
 
             var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user.DeviceId != null && model.DeviceId != user.DeviceId)
+            /*if (user.DeviceId != null && model.DeviceId != user.DeviceId)
             {
 
                 return View(model);
 
-            }
+            }*/
             if (ModelState.IsValid)
             {
                 
