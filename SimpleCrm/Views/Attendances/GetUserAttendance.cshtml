@@ -110,19 +110,19 @@
                 });
 
                 const workbook = XLSX.utils.book_new();
-                const worksheet = XLSX.utils.json_to_sheet(attendanceList.reverse(), { origin: "A2" }); 
+                const worksheet = XLSX.utils.json_to_sheet(attendanceList, { origin: "A2" }); 
                 let title = $('.PageTitle').text().trim();
         
                 // Remove invalid characters for file names (e.g., slashes, colons, etc.)
                 title = title.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_');
-
+                // worksheet["A1:Z1"].width
                 // Add a title row spanning 4 columns
                 worksheet["A1"] = { v: `${title} Attendance`, t: "s" }; 
                 worksheet["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }]; // Merge A1:D1
 
                 // Append the worksheet to the workbook
                 XLSX.utils.book_append_sheet(workbook, worksheet, "Attendance");
-                
+                 worksheet['!cols'] = Array(5).fill({ wch: 20 });
                 // Define the filename using the title
                 let filename = `${title}.xlsx`;
                 // Generate the Excel file and trigger download
