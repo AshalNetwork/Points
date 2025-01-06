@@ -44,17 +44,19 @@
                             {                                
                                 @if (!User.IsInRole("Employee"))
                                 {
-                                    <li class="nav-item">
+                                    @* <li class="nav-item">
 
                                         <a class="nav-link text-dark" asp-area="" asp-controller="Tasks" asp-action="Index">Tasks</a>
                                     </li>
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">Users</a>
                                     <li class="nav-item">
                                         <a class="nav-link text-dark" asp-area="" asp-controller="Penalities" asp-action="Index">Penalities</a>
                                     </li> 
                                     <li class="nav-item">
                                         <a class="nav-link text-dark" asp-area="" asp-controller="Sales" asp-action="Index">Sales</a>
-                                    </li> 
+                                    </li>  *@
+                                    <li class="nav-item">
+                                        <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">Users</a>
+                                    </li>
                                     <li class="nav-item">
                                         <a class="nav-link text-dark" asp-area="" asp-controller="Attendances" asp-action="Index">Attendance</a>
                                     </li> 
@@ -66,14 +68,10 @@
                         <ul class="navbar-nav flex-grow-1">
                             @if (User.Identity.IsAuthenticated)
                             {
-                                    <li class="nav-item">
+@*                                     <li class="nav-item">
                                         <a href="\Tasks\UserTasks?UserId=@userId" class="nav-link text-dark"><i class="bi bi-list-task"></i> My Tasks</a>
-
-@*                                         <a class="nav-link text-dark" asp-area="" asp-controller="Tasks" asp-action="UserTasks"> <i class="bi bi-list-task"></i> My Tasks</a>
- *@                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link text-dark" asp-area="" asp-controller="Reports" asp-action="UserReports"> <i class="bi bi-chat-left-dots-fill"></i> My Reports</a>
-                                    </li>
+                                   </li>
+                                   
                                     <li class="nav-item">
                                         <a class="nav-link text-dark" asp-area="" asp-controller="Penalities" asp-action="UserPenalities"> <i class="bi bi-bug"></i> My Penalities</a>
                                     </li>
@@ -83,12 +81,16 @@
                                     <li class="nav-item">
                                         <a href="\UserPoints\GetUserPointsInDay?UserId=@userId" class="nav-link text-dark"> <i class="bi bi-star-half"></i> My Points</a>
                                     </li>
-                                    <li class="nav-item">
-                                    <a href="\Attendances\GetUserAttendance?UserId=@userId" class="nav-link text-dark"> <i class="bi bi-box-arrow-in-right"></i> My Attendance</a>
-                                    </li>
+                                    
                                     <li class="nav-item">
                                     <a href="\Projects\Index" class="nav-link text-dark"> <i class="bi bi-box-arrow-in-right"></i>Projects</a>
-                                    </li>
+                                    </li> *@
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Reports" asp-action="UserReports"> <i class="bi bi-chat-left-dots-fill"></i> My Reports</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="\Attendances\GetUserAttendance?UserId=@userId" class="nav-link text-dark"> <i class="bi bi-box-arrow-in-right"></i> My Attendance</a>
+                                </li>
                             }
                         </ul>
                         <ul class="navbar-nav">
