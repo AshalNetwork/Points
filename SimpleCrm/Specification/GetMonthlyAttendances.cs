@@ -8,7 +8,7 @@ namespace SimpleCrm.Specification
         {
             Includes.Add(e=>e.ApplicationUser);
 
-            Criteria = e => e.ApplicationUserId == userId && e.Date >= DateTime.Now.AddDays(-36);
+            Criteria = e => e.ApplicationUserId == userId && e.Date >= DateTime.Now.AddDays(-40);
             OrderBy= e=>e.Date;
         }
     }
