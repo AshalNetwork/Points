@@ -1,4 +1,5 @@
-﻿using SimpleCrm.Models;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using SimpleCrm.Models;
 
 namespace SimpleCrm.Specification
 {
@@ -7,7 +8,9 @@ namespace SimpleCrm.Specification
         public GetUserReportsSpec(string UserId):base(z=>z.UserId==UserId)
         {
             Includes.Add(z => z.User);
-            OrderByDesc = z => z.Date;
+            Criteria = e => e.UserId == UserId && e.Date >= DateTime.Now.AddDays(-31);
+
+            OrderBy = z => z.Date;
         }
     }
 }

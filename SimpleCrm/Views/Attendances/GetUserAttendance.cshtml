@@ -28,7 +28,7 @@
     }
     else if (Model.Where(z => z.Date.Date == DateTime.Now.Date && z.CheckOut == TimeSpan.Zero).Count() > 0)
     {
-        if(DateTime.Now.Hour>14)
+        if(DateTime.Now.Hour>13)
         {
         <form asp-controller="Attendances" asp-action="Index" method="post" class="w-75 m-auto">
             @Html.AntiForgeryToken()
@@ -72,20 +72,13 @@
                         var egyptTime = new TimeSpan();
                         TimeSpan late = new TimeSpan();
 
-                        if (user.Email.ToLower() == "sy034692@gmail.com")
-                        {
-                            egyptTime = new TimeSpan(13, 0, 0);
-                            if (task.CheckIn > new TimeSpan(13, 0, 0))
-                                late = task.CheckIn - egyptTime;
-                        }
-                        else
-                        {
-                            egyptTime = new TimeSpan(9, 0, 0);
-                            if (task.CheckIn > new TimeSpan(9, 0, 0))
-                                late = task.CheckIn - egyptTime;
-                        }
+                        
+                        egyptTime = new TimeSpan(9, 0, 0);
+                        if (task.CheckIn > new TimeSpan(9, 0, 0))
+                            late = task.CheckIn - egyptTime;
+                        
                     }
-                    @late.Hours.ToString("D2"): @late.Minutes.ToString("D2") : @late.Seconds.ToString("D2")
+                    @late.Hours.ToString("D2"): @late.Minutes.ToString("D2") 
                 </td>
             </tr>
         }
