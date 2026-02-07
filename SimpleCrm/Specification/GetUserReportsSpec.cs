@@ -8,7 +8,7 @@ namespace SimpleCrm.Specification
         public GetUserReportsSpec(string UserId):base(z=>z.UserId==UserId)
         {
             Includes.Add(z => z.User);
-            Criteria = e => e.UserId == UserId && e.Date >= DateTime.Now.AddDays(-31);
+            Criteria = e => e.UserId == UserId && e.Date >= DateTime.Now.AddDays(-38);
 
             OrderBy = z => z.Date;
         }
