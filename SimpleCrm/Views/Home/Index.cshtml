@@ -24,8 +24,8 @@
 
             }else if (Model.Where(z => z.Date.Date == DateTime.Now.Date && z.CheckOut == TimeSpan.Zero).Count() > 0)
             {
-                if (DateTime.Now.Hour > 14)
-                {
+               @*  if (DateTime.Now.Hour > 14)
+                { *@
                     <form asp-controller="Attendances" asp-action="Index" method="post" class="w-75 m-auto">
                         @Html.AntiForgeryToken()
                         <div class="form-group">
@@ -34,7 +34,7 @@
 
                         <button type="submit" class="btn btn-primary mt-1">Leave</button>
                     </form>
-                }
+               @*  } *@
             }
         </div>
     </div>
