@@ -1,4 +1,6 @@
-﻿namespace SimpleCrm.Models
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+
+namespace SimpleCrm.Models
 {
     public class Attendance
     {
@@ -8,6 +10,8 @@
         public DateTime Date { get; set; }
 
         public string ApplicationUserId { get; set; } = null!;
+
+        [ValidateNever]
         public ApplicationUser ApplicationUser { get; set; } = null!;
 
     }

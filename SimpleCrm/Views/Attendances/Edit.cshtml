@@ -1,0 +1,43 @@
+@model SimpleCrm.VM.AttendanceEditVM
+
+@{
+    ViewData["Title"] = "Edit Attendance";
+}
+
+<h3 class="text-center m-5">Edit Attendance</h3>
+
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <form asp-action="Edit" asp-route-id="@Model.Id" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="ApplicationUserId" />
+
+            <div class="mb-3">
+                <label asp-for="Date" class="form-label">Date</label>
+                <input asp-for="Date" class="form-control" type="date" value="@Model.Date.ToString("yyyy-MM-dd")" />
+                <span asp-validation-for="Date" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="CheckIn" class="form-label">Check In</label>
+                <input type="time" name="CheckIn" id="CheckIn" class="form-control" value="@($"{Model.CheckIn.Hours:D2}:{Model.CheckIn.Minutes:D2}")" required />
+                <span asp-validation-for="CheckIn" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="CheckOut" class="form-label">Check Out</label>
+                <input type="time" name="CheckOut" id="CheckOut" class="form-control" value="@($"{Model.CheckOut.Hours:D2}:{Model.CheckOut.Minutes:D2}")" required />
+                <span asp-validation-for="CheckOut" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a asp-action="GetUserAttendance" asp-route-UserId="@Model.ApplicationUserId" class="btn btn-secondary ms-2">Cancel</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+

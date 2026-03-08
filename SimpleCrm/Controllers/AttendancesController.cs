@@ -1,4 +1,4 @@
-﻿using ClosedXML.Excel;
+using ClosedXML.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -10,6 +10,7 @@ using SimpleCrm.IRepository;
 using SimpleCrm.Models;
 using SimpleCrm.Services;
 using SimpleCrm.Specification;
+using SimpleCrm.VM;
 using System.ComponentModel;
 using System.Security.Claims;
 using LicenseContext = OfficeOpenXml.LicenseContext;
@@ -29,37 +30,31 @@ namespace SimpleCrm.Controllers
         [HttpPost]
         public async Task<IActionResult> Index([FromForm] string userId)
         {
-            var user = await userManager.FindByIdAsync(User.Claims.FirstOrDefault(e => e.Type == ClaimTypes.NameIdentifier)!.Value);
-            var attendances = unitOfWork.Repository<Attendance>().GetAllWithSpecAsync(new GetUserAttendanceSpec(user.Email, DateTime.Now)).Result.LastOrDefault();
-
-            ViewBag.Attendance = attendances?.CheckIn ?? new TimeSpan();
             var egyptTimeZoneId = "Egypt Standard Time";
             var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById(egyptTimeZoneId);
             var egyptTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
 
-            if (attendances == null)
+            // Find today's record that has check-in but no check-out (same record we update on "Leave")
+            var openAttendance = await unitOfWork.Repository<Attendance>()
+                .GetEntityWithSpecAsync(new GetTodayOpenAttendanceSpec(userId, egyptTime));
+
+            if (openAttendance != null)
             {
-                await unitOfWork.Repository<Attendance>().Add(new Attendance
-                {
-                    Date = egyptTime.Date,
-                    ApplicationUserId = userId,
-                    CheckIn = egyptTime.TimeOfDay,
-                });
-            }
-            else if (attendances.CheckOut == TimeSpan.Zero)
-            {
-                attendances.CheckOut = egyptTime.TimeOfDay;
+                // User is checking out: update the same record with check-out time
+                openAttendance.CheckOut = egyptTime.TimeOfDay;
+                unitOfWork.Repository<Attendance>().Update(openAttendance);
             }
             else
             {
+                // User is checking in: create one new record with check-in only
                 await unitOfWork.Repository<Attendance>().Add(new Attendance
                 {
                     Date = egyptTime.Date,
                     ApplicationUserId = userId,
                     CheckIn = egyptTime.TimeOfDay,
                 });
-
             }
+
             await unitOfWork.Complete();
             return RedirectToAction("UserTasks", "Tasks");
         }
@@ -71,6 +66,78 @@ namespace SimpleCrm.Controllers
             var attendances = await unitOfWork.Repository<Attendance>().
                 GetAllWithSpecAsync(new GetMonthlyAttendances(UserId));
             return View(attendances);
+        }
+
+        [Authorize(Roles = "ProductionMangerA,ProductionMangerB,OperationManger")]
+        [HttpGet]
+        public async Task<IActionResult> Edit(Guid id)
+        {
+            var attendance = await unitOfWork.Repository<Attendance>().GetBYIdAsync(id);
+            if (attendance is null)
+            {
+                return NotFound();
+            }
+
+            var vm = new AttendanceEditVM
+            {
+                Id = attendance.Id,
+                ApplicationUserId = attendance.ApplicationUserId,
+                Date = attendance.Date,
+                CheckIn = attendance.CheckIn,
+                CheckOut = attendance.CheckOut,
+            };
+
+            return View(vm);
+        }
+
+        [Authorize(Roles = "ProductionMangerA,ProductionMangerB,OperationManger")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(Guid id, AttendanceEditVM model)
+        {
+            if (id != model.Id)
+            {
+                return BadRequest();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var attendance = await unitOfWork.Repository<Attendance>().GetBYIdAsync(id);
+            if (attendance is null)
+            {
+                return NotFound();
+            }
+
+            attendance.Date = model.Date;
+            attendance.CheckIn = model.CheckIn;
+            attendance.CheckOut = model.CheckOut;
+
+            unitOfWork.Repository<Attendance>().Update(attendance);
+            await unitOfWork.Complete();
+
+            return RedirectToAction(nameof(GetUserAttendance), new { UserId = attendance.ApplicationUserId });
+        }
+
+        [Authorize(Roles = "ProductionMangerA,ProductionMangerB,OperationManger")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var attendance = await unitOfWork.Repository<Attendance>().GetBYIdAsync(id);
+            if (attendance is null)
+            {
+                return NotFound();
+            }
+
+            var userId = attendance.ApplicationUserId;
+
+            unitOfWork.Repository<Attendance>().Delete(attendance);
+            await unitOfWork.Complete();
+
+            return RedirectToAction(nameof(GetUserAttendance), new { UserId = userId });
         }
       
     }
